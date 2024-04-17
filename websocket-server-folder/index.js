@@ -15,6 +15,45 @@ let games = [];
 // -------- GAME METHODS -----------
 // ---------------------------------
 
+const emitGameStart = (game) => {
+  game.player1Socket.emit(
+    "game.start",
+    GameService.send.forPlayer.viewGameState("player:1", game)
+  );
+  game.player2Socket.emit(
+    "game.start",
+    GameService.send.forPlayer.viewGameState("player:2", game)
+  );
+};
+
+const updateClientViewTimer = (game) => {
+  game.player1Socket.emit(
+    "game.timer",
+    GameService.send.forPlayer.gameTimer("player:1", game.gameState)
+  );
+  game.player2Socket.emit(
+    "game.timer",
+    GameService.send.forPlayer.gameTimer("player:2", game.gameState)
+  );
+};
+
+const updateGameInterval = (game) => {
+  game.gameState.timer--;
+
+  // Si le timer tombe à zéro
+  if (game.gameState.timer === 0) {
+    // On change de tour en inversant le clé dans 'currentTurn'
+    game.gameState.currentTurn =
+      game.gameState.currentTurn === "player:1" ? "player:2" : "player:1";
+
+    // Méthode du service qui renvoie la constante 'TURN_DURATION'
+    game.gameState.timer = GameService.timer.getTurnDuration();
+  }
+
+  // On notifie finalement les clients que les données sont mises à jour.
+  updateClientViewTimer(game);
+};
+
 const newPlayerInQueue = (socket) => {
   queue.push(socket);
 
@@ -37,49 +76,13 @@ const createGame = (player1Socket, player2Socket) => {
   games.push(newGame);
 
   const gameIndex = GameService.utils.findGameIndexById(games, newGame.idGame);
+  const game = games[gameIndex];
 
   // On execute une fonction toutes les secondes (1000 ms)
-  const gameInterval = setInterval(() => {
-    games[gameIndex].gameState.timer--;
-
-    // Si le timer tombe à zéro
-    if (games[gameIndex].gameState.timer === 0) {
-      // On change de tour en inversant le clé dans 'currentTurn'
-      games[gameIndex].gameState.currentTurn =
-        games[gameIndex].gameState.currentTurn === "player:1"
-          ? "player:2"
-          : "player:1";
-
-      // Méthode du service qui renvoie la constante 'TURN_DURATION'
-      games[gameIndex].gameState.timer = GameService.timer.getTurnDuration();
-    }
-
-    // On notifie finalement les clients que les données sont mises à jour.
-    games[gameIndex].player1Socket.emit(
-      "game.timer",
-      GameService.send.forPlayer.gameTimer(
-        "player:1",
-        games[gameIndex].gameState
-      )
-    );
-    games[gameIndex].player2Socket.emit(
-      "game.timer",
-      GameService.send.forPlayer.gameTimer(
-        "player:2",
-        games[gameIndex].gameState
-      )
-    );
-  }, 1000);
+  const gameInterval = setInterval(() => updateGameInterval(game), 1000);
 
   // Send game start event to players
-  games[gameIndex].player1Socket.emit(
-    "game.start",
-    GameService.send.forPlayer.viewGameState("player:1", games[gameIndex])
-  );
-  games[gameIndex].player2Socket.emit(
-    "game.start",
-    GameService.send.forPlayer.viewGameState("player:2", games[gameIndex])
-  );
+  emitGameStart(game);
 
   // On prévoit de couper l'horloge
   // pour le moment uniquement quand le socket se déconnecte
