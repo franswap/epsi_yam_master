@@ -110,7 +110,7 @@ const GameService = {
           gameState.currentTurn === playerKey ? 0 : gameState.timer;
         return { playerTimer: playerTimer, opponentTimer: opponentTimer };
       },
-      deckViewState: (playerKey, gameState) => {
+      viewDeckState: (playerKey, gameState) => {
         const deckViewState = {
           displayPlayerDeck: gameState.currentTurn === playerKey,
           displayOpponentDeck: gameState.currentTurn !== playerKey,

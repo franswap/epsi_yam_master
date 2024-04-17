@@ -13,6 +13,7 @@ const PlayerDeck = () => {
 
   useEffect(() => {
     socket.on("game.deck.view-state", (data) => {
+      console.log("game.deck.view-state", data);
       setDisplayPlayerDeck(data["displayPlayerDeck"]);
       if (data["displayPlayerDeck"]) {
         setDisplayRollButton(data["displayRollButton"]);

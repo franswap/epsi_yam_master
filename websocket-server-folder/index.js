@@ -26,7 +26,7 @@ const emitGameStart = (game) => {
   );
 };
 
-const updateClientViewTimer = (game) => {
+const updateClientViewTimers = (game) => {
   game.player1Socket.emit(
     "game.timer",
     GameService.send.forPlayer.gameTimer("player:1", game.gameState)
@@ -35,6 +35,20 @@ const updateClientViewTimer = (game) => {
     "game.timer",
     GameService.send.forPlayer.gameTimer("player:2", game.gameState)
   );
+};
+
+const updateClientViewDecks = (game) => {
+  setTimeout(() => {
+    game.player1Socket.emit(
+      "game.deck.view-state",
+      GameService.send.forPlayer.viewDeckState("player:1", game.gameState)
+    );
+    console.log("game.gameState: ", game.gameState);
+    game.player2Socket.emit(
+      "game.deck.view-state",
+      GameService.send.forPlayer.viewDeckState("player:2", game.gameState)
+    );
+  }, 200);
 };
 
 const updateGameInterval = (game) => {
@@ -48,10 +62,14 @@ const updateGameInterval = (game) => {
 
     // Méthode du service qui renvoie la constante 'TURN_DURATION'
     game.gameState.timer = GameService.timer.getTurnDuration();
+
+    // On remet le compteur de lancer de dés à zéro
+    game.gameState.deck = GameService.init.deck();
+    updateClientViewDecks(game);
   }
 
   // On notifie finalement les clients que les données sont mises à jour.
-  updateClientViewTimer(game);
+  updateClientViewTimers(game);
 };
 
 const newPlayerInQueue = (socket) => {
@@ -83,6 +101,7 @@ const createGame = (player1Socket, player2Socket) => {
 
   // Send game start event to players
   emitGameStart(game);
+  updateClientViewDecks(game);
 
   // On prévoit de couper l'horloge
   // pour le moment uniquement quand le socket se déconnecte
