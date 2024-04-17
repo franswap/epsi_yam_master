@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { StyleSheet, View, Button, Text } from "react-native";
 import { SocketContext } from "../contexts/socket.context";
 import OnlineGameController from "../controllers/online-game.controller";
@@ -17,7 +17,7 @@ export default function OnlineGameScreen({ navigation }) {
         </>
       )}
 
-      {socket && <OnlineGameController />}
+      {socket && <OnlineGameController navigation={navigation}/>}
     </View>
   );
 }

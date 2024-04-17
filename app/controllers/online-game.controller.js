@@ -1,13 +1,20 @@
 import React, { useEffect, useState, useContext } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Button } from "react-native";
 import { SocketContext } from "../contexts/socket.context";
 
-export default function OnlineGameController() {
+export default function OnlineGameController({ navigation }) {
   const socket = useContext(SocketContext);
 
   const [inQueue, setInQueue] = useState(false);
   const [inGame, setInGame] = useState(false);
   const [idOpponent, setIdOpponent] = useState(null);
+
+  // fonction pour quitter la queue
+  const leaveQueue = () => {
+    console.log("[emit][queue.leave]:", socket.id);
+    socket.emit("queue.leave");
+    navigation.navigate("HomeScreen");
+  };
 
   useEffect(() => {
     console.log("[emit][queue.join]:", socket.id);
@@ -27,6 +34,12 @@ export default function OnlineGameController() {
       setInGame(data["inGame"]);
       setIdOpponent(data["idOpponent"]);
     });
+
+    socket.on("queue.removed", (data) => {
+      console.log("[listen][queue.leave]:", data);
+      setInQueue(data["inQueue"]);
+      setInGame(data["inGame"]);
+    });
   }, []);
 
   return (
@@ -40,6 +53,7 @@ export default function OnlineGameController() {
       {inQueue && (
         <>
           <Text style={styles.paragraph}>Waiting for another player...</Text>
+          <Button title="Revenir au menu" onPress={leaveQueue} />
         </>
       )}
 

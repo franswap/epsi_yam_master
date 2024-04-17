@@ -49,6 +49,17 @@ const createGame = (player1Socket, player2Socket) => {
   );
 };
 
+const leaveQueue = (socket) => {
+  console.log("queue before: ", queue);
+  const index = queue.indexOf(socket);
+  if (index > -1) {
+    queue.splice(index, 1);
+  }
+  console.log("queue after: ", queue);
+
+  socket.emit("queue.removed", GameService.send.forPlayer.viewQueueState());
+};
+
 // ---------------------------------------
 // -------- SOCKETS MANAGEMENT -----------
 // ---------------------------------------
@@ -59,6 +70,11 @@ io.on("connection", (socket) => {
   socket.on("queue.join", () => {
     console.log(`[${socket.id}] new player in queue `);
     newPlayerInQueue(socket);
+  });
+
+  socket.on("queue.leave", () => {
+    console.log(`[${socket.id}] player leave the queue`);
+    leaveQueue(socket);
   });
 
   socket.on("disconnect", (reason) => {
