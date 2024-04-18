@@ -142,6 +142,44 @@ io.on("connection", (socket) => {
     leaveQueue(socket);
   });
 
+  socket.on("game.dices.roll", () => {
+    const gameIndex = GameService.utils.findGameIndexBySocketId(
+      games,
+      socket.id
+    );
+
+    let rollsCounter = games[gameIndex].gameState.deck.rollsCounter;
+    let rollsMaximum = games[gameIndex].gameState.deck.rollsMaximum;
+    let oldDices = games[gameIndex].gameState.deck.dices;
+
+    games[gameIndex].gameState.deck.dices = GameService.dices.roll(oldDices);
+    games[gameIndex].gameState.deck.rollsCounter++;
+
+    if (rollsCounter === rollsMaximum) {
+      games[gameIndex].gameState.deck.lockedDices =
+        GameService.dices.lockEveryDice(oldDices);
+
+      games[gameIndex].gameState.timer = 5;
+    }
+    updateClientViewDecks(games[gameIndex]);
+  });
+
+  socket.on("game.dices.lock", (idDice) => {
+    const gameIndex = GameService.utils.findGameIndexBySocketId(
+      games,
+      socket.id
+    );
+    const diceIndex = GameService.utils.findDiceIndexByDiceId(
+      games[gameIndex].gameState.deck.dices,
+      idDice
+    );
+
+    games[gameIndex].gameState.deck.dices[diceIndex].locked =
+      !games[gameIndex].gameState.deck.dices[diceIndex].locked;
+
+    updateClientViewDecks(games[gameIndex]);
+  });
+
   socket.on("disconnect", (reason) => {
     console.log(`[${socket.id}] socket disconnected - ${reason}`);
   });
