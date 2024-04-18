@@ -18,11 +18,11 @@ let games = [];
 const emitGameStart = (game) => {
   game.player1Socket.emit(
     "game.start",
-    GameService.send.forPlayer.viewGameState("player:1", game)
+    GameService.send.forPlayer.gameViewState("player:1", game)
   );
   game.player2Socket.emit(
     "game.start",
-    GameService.send.forPlayer.viewGameState("player:2", game)
+    GameService.send.forPlayer.gameViewState("player:2", game)
   );
 };
 
@@ -41,12 +41,12 @@ const updateClientViewDecks = (game) => {
   setTimeout(() => {
     game.player1Socket.emit(
       "game.deck.view-state",
-      GameService.send.forPlayer.viewDeckState("player:1", game.gameState)
+      GameService.send.forPlayer.deckViewState("player:1", game.gameState)
     );
     console.log("game.gameState: ", game.gameState);
     game.player2Socket.emit(
       "game.deck.view-state",
-      GameService.send.forPlayer.viewDeckState("player:2", game.gameState)
+      GameService.send.forPlayer.deckViewState("player:2", game.gameState)
     );
   }, 200);
 };
