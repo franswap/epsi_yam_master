@@ -1,3 +1,7 @@
+import { useState, useEffect, useContext } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { SocketContext } from "../../../contexts/socket.context";
+
 const Choices = () => {
   const socket = useContext(SocketContext);
 

@@ -164,13 +164,10 @@ const GameService = {
   choices: {
     findCombinations: (dices, isDefi, isSec) => {
       const allCombinations = ALL_COMBINATIONS;
-
       // Tableau des objets 'combinations' disponibles parmi 'ALL_COMBINATIONS'
       const availableCombinations = [];
 
-      // Tableau pour compter le nombre de dés de chaque valeur (de 1 à 6)
-      const counts = Array(7).fill(0);
-
+      const counts = Array(7).fill(0); // Tableau pour compter le nombre de dés de chaque valeur (de 1 à 6)
       let hasPair = false; // check: paire
       let threeOfAKindValue = null; // check: valeur brelan
       let hasThreeOfAKind = false; // check: brelan
@@ -178,15 +175,46 @@ const GameService = {
       let hasFiveOfAKind = false; // check: yam
       let hasStraight = false; // check: suite
       let sum = 0; // sum of dices
+      let isLessThanEqual8 = false; // check: ≤8
 
-      // -----------------------------------
-      // TODO: Vérifier les combinaisons possibles
-      // -----------------------------------
+      // Compter le nombre de dés de chaque valeur et calculer la somme
+      for (let i = 0; i < dices.length; i++) {
+        const diceValue = parseInt(dices[i].value);
+        counts[diceValue]++;
+        sum += diceValue;
+      }
 
-      // return available combinations
+      // Vérifier les combinaisons possibles
+      counts.forEach((count) => {
+        // Paire
+        if (count === 2) {
+          hasPair = true;
+        }
+        // Brelan
+        else if (count === 3) {
+          threeOfAKindValue = count;
+          hasThreeOfAKind = true;
+        }
+        // Carré
+        else if (count === 4) {
+          threeOfAKindValue = count;
+          hasThreeOfAKind = true;
+          hasFourOfAKind = true;
+        } // Yam
+        else if (count === 5) {
+          threeOfAKindValue = count;
+          hasThreeOfAKind = true;
+          hasFourOfAKind = true;
+          hasFiveOfAKind = true;
+        }
+      });
+      if (counts.slice(1).join("").includes("11111")) hasStraight = true; // Suite
+      if (sum <= 8) isLessThanEqual8 = true; // ≤8
+
+      // Retourner les combinaisons possibles via leur ID
       allCombinations.forEach((combination) => {
         if (
-          (combination.id.includes("brelan") &&
+          (combination.id.startsWith("brelan") &&
             hasThreeOfAKind &&
             parseInt(combination.id.slice(-1)) === threeOfAKindValue) ||
           (combination.id === "full" && hasPair && hasThreeOfAKind) ||
@@ -200,6 +228,26 @@ const GameService = {
         }
       });
 
+      const notOnlyBrelan = availableCombinations.some(
+        (combination) => !combination.id.includes("brelan")
+      );
+
+      if (isSec && availableCombinations.length > 0 && notOnlyBrelan) {
+        availableCombinations.push(
+          allCombinations.find((combination) => combination.id === "sec")
+        );
+      }
+      console.log("-------------------------");
+      console.log("availableCombinations", availableCombinations);
+      console.log("counts", counts);
+      console.log("hasPair", hasPair);
+      console.log("threeOfAKindValue", threeOfAKindValue);
+      console.log("hasThreeOfAKind", hasThreeOfAKind);
+      console.log("hasFourOfAKind", hasFourOfAKind);
+      console.log("hasFiveOfAKind", hasFiveOfAKind);
+      console.log("hasStraight", hasStraight);
+      console.log("sum", sum);
+      console.log("isLessThanEqual8", isLessThanEqual8);
       return availableCombinations;
     },
   },

@@ -15,7 +15,7 @@ let games = [];
 // -------- GAME METHODS -----------
 // ---------------------------------
 
-const emitGameStart = (game) => {
+const emitClientsViewGameStart = (game) => {
   game.player1Socket.emit(
     "game.start",
     GameService.send.forPlayer.gameViewState("player:1", game)
@@ -26,7 +26,7 @@ const emitGameStart = (game) => {
   );
 };
 
-const updateClientViewTimers = (game) => {
+const updateClientsViewTimers = (game) => {
   game.player1Socket.emit(
     "game.timer",
     GameService.send.forPlayer.gameTimer("player:1", game.gameState)
@@ -37,13 +37,12 @@ const updateClientViewTimers = (game) => {
   );
 };
 
-const updateClientViewDecks = (game) => {
+const updateClientsViewDecks = (game) => {
   setTimeout(() => {
     game.player1Socket.emit(
       "game.deck.view-state",
       GameService.send.forPlayer.deckViewState("player:1", game.gameState)
     );
-    console.log("game.gameState: ", game.gameState);
     game.player2Socket.emit(
       "game.deck.view-state",
       GameService.send.forPlayer.deckViewState("player:2", game.gameState)
@@ -51,25 +50,72 @@ const updateClientViewDecks = (game) => {
   }, 200);
 };
 
+const updateClientsViewChoices = (game) => {
+  game.player1Socket.emit(
+    "game.choices.view-state",
+    GameService.send.forPlayer.choicesViewState("player:1", game.gameState)
+  );
+  game.player2Socket.emit(
+    "game.choices.view-state",
+    GameService.send.forPlayer.choicesViewState("player:2", game.gameState)
+  );
+};
+
 const updateGameInterval = (game) => {
   game.gameState.timer--;
 
-  // Si le timer tombe à zéro
+  // if timer is down to 0, we end turn
   if (game.gameState.timer === 0) {
-    // On change de tour en inversant le clé dans 'currentTurn'
+    // switch currentTurn variable
     game.gameState.currentTurn =
       game.gameState.currentTurn === "player:1" ? "player:2" : "player:1";
 
-    // Méthode du service qui renvoie la constante 'TURN_DURATION'
+    // Reset timer, deck and choices
     game.gameState.timer = GameService.timer.getTurnDuration();
-
-    // On remet le compteur de lancer de dés à zéro
     game.gameState.deck = GameService.init.deck();
-    updateClientViewDecks(game);
-  }
+    game.gameState.choices = GameService.init.choices();
 
-  // On notifie finalement les clients que les données sont mises à jour.
-  updateClientViewTimers(game);
+    // Update clients view decks and choices
+    updateClientsViewDecks(game);
+    updateClientsViewChoices(game);
+  }
+  // Update clients view timers
+  updateClientsViewTimers(game);
+};
+
+const handlePlayersDisconnects = (game, gameInterval) => {
+  game.player1Socket.on("disconnect", () => {
+    clearInterval(gameInterval);
+  });
+  game.player2Socket.on("disconnect", () => {
+    clearInterval(gameInterval);
+  });
+};
+
+const createGame = (player1Socket, player2Socket) => {
+  // init objet (game) with this first level of structure:
+  // - gameState : { .. evolutive object .. }
+  // - idGame : just in case ;)
+  // - player1Socket: socket instance key "joueur:1"
+  // - player2Socket: socket instance key "joueur:2"
+  const newGame = GameService.init.gameState();
+  newGame["idGame"] = uniqid();
+  newGame["player1Socket"] = player1Socket;
+  newGame["player2Socket"] = player2Socket;
+  games.push(newGame);
+
+  // Send game start event to players
+  emitClientsViewGameStart(newGame);
+
+  // Timer every second
+  const gameInterval = setInterval(() => updateGameInterval(newGame), 1000);
+
+  // Update clients view
+  updateClientsViewTimers(newGame);
+  updateClientsViewDecks(newGame);
+
+  // When a player disconnects, we clear the timer
+  handlePlayersDisconnects(newGame, gameInterval);
 };
 
 const newPlayerInQueue = (socket) => {
@@ -85,42 +131,9 @@ const newPlayerInQueue = (socket) => {
   }
 };
 
-const createGame = (player1Socket, player2Socket) => {
-  const newGame = GameService.init.gameState();
-  newGame["idGame"] = uniqid();
-  newGame["player1Socket"] = player1Socket;
-  newGame["player2Socket"] = player2Socket;
-
-  games.push(newGame);
-
-  const gameIndex = GameService.utils.findGameIndexById(games, newGame.idGame);
-  const game = games[gameIndex];
-
-  // On execute une fonction toutes les secondes (1000 ms)
-  const gameInterval = setInterval(() => updateGameInterval(game), 1000);
-
-  // Send game start event to players
-  emitGameStart(game);
-  updateClientViewDecks(game);
-
-  // On prévoit de couper l'horloge
-  // pour le moment uniquement quand le socket se déconnecte
-  player1Socket.on("disconnect", () => {
-    clearInterval(gameInterval);
-  });
-
-  player2Socket.on("disconnect", () => {
-    clearInterval(gameInterval);
-  });
-};
-
 const leaveQueue = (socket) => {
-  console.log("queue before: ", queue);
   const index = queue.indexOf(socket);
-  if (index > -1) {
-    queue.splice(index, 1);
-  }
-  console.log("queue after: ", queue);
+  if (index > -1) queue.splice(index, 1);
 
   socket.emit("queue.removed", GameService.send.forPlayer.viewQueueState());
 };
@@ -142,26 +155,82 @@ io.on("connection", (socket) => {
     leaveQueue(socket);
   });
 
+  // socket.on("game.dices.roll", () => {
+  //   const gameIndex = GameService.utils.findGameIndexBySocketId(
+  //     games,
+  //     socket.id
+  //   );
+  //   // dices management
+  //   games[gameIndex].gameState.deck.dices = GameService.dices.roll(
+  //     games[gameIndex].gameState.deck.dices
+  //   );
+  //   games[gameIndex].gameState.deck.rollsCounter++;
+
+  //   // combinations management
+  //   const dices = games[gameIndex].gameState.deck.dices;
+  //   const isDefi = false;
+  //   const isSec = games[gameIndex].gameState.deck.rollsCounter === 2;
+
+  //   // if last throw
+  //   if (
+  //     games[gameIndex].gameState.deck.rollsCounter ===
+  //     games[gameIndex].gameState.deck.rollsMaximum
+  //   ) {
+  //     games[gameIndex].gameState.deck.dices = GameService.dices.lockEveryDice(
+  //       games[gameIndex].gameState.deck.dices
+  //     );
+  //     // temporary put timer at 5 sec to test turn switching
+  //     games[gameIndex].gameState.timer = 5;
+  //   }
+
+  //   const combinations = GameService.choices.findCombinations(
+  //     dices,
+  //     isDefi,
+  //     isSec
+  //   );
+  //   games[gameIndex].gameState.choices.availableChoices = combinations;
+
+  //   // emit to views new state
+  //   updateClientsViewDecks(games[gameIndex]);
+  //   updateClientsViewChoices(games[gameIndex]);
+  // });
+
   socket.on("game.dices.roll", () => {
+    // Get game
     const gameIndex = GameService.utils.findGameIndexBySocketId(
       games,
       socket.id
     );
+    const game = games[gameIndex];
 
-    let rollsCounter = games[gameIndex].gameState.deck.rollsCounter;
-    let rollsMaximum = games[gameIndex].gameState.deck.rollsMaximum;
-    let oldDices = games[gameIndex].gameState.deck.dices;
+    // Roll dices
+    const dices = game.gameState.deck.dices;
+    game.gameState.deck.dices = GameService.dices.roll(dices);
+    game.gameState.deck.rollsCounter++;
 
-    games[gameIndex].gameState.deck.dices = GameService.dices.roll(oldDices);
-    games[gameIndex].gameState.deck.rollsCounter++;
+    // Constants for rolls management
+    const rollsCounter = game.gameState.deck.rollsCounter;
+    const rollsMaximum = game.gameState.deck.rollsMaximum;
+    const isDefi = false;
+    const isSec = rollsCounter === 2;
+    const combinations = GameService.choices.findCombinations(
+      dices,
+      isDefi,
+      isSec
+    );
 
-    if (rollsCounter === rollsMaximum) {
-      games[gameIndex].gameState.deck.lockedDices =
-        GameService.dices.lockEveryDice(oldDices);
+    // Update available choices
+    game.gameState.choices.availableChoices = combinations;
 
-      games[gameIndex].gameState.timer = 5;
+    // if last roll we lock every dice
+    if (rollsCounter - 1 === rollsMaximum) {
+      game.gameState.deck.dices = GameService.dices.lockEveryDice(dices);
+      game.gameState.timer = 5;
     }
-    updateClientViewDecks(games[gameIndex]);
+
+    // Update clients view
+    updateClientsViewDecks(game);
+    updateClientsViewChoices(game);
   });
 
   socket.on("game.dices.lock", (idDice) => {
@@ -177,7 +246,18 @@ io.on("connection", (socket) => {
     games[gameIndex].gameState.deck.dices[diceIndex].locked =
       !games[gameIndex].gameState.deck.dices[diceIndex].locked;
 
-    updateClientViewDecks(games[gameIndex]);
+    updateClientsViewDecks(games[gameIndex]);
+  });
+
+  socket.on("game.choices.selected", (data) => {
+    // gestion des choix
+    const gameIndex = GameService.utils.findGameIndexBySocketId(
+      games,
+      socket.id
+    );
+    games[gameIndex].gameState.choices.idSelectedChoice = data.choiceId;
+
+    updateClientsViewChoices(games[gameIndex]);
   });
 
   socket.on("disconnect", (reason) => {
