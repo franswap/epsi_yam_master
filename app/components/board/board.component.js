@@ -1,10 +1,10 @@
-import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import PlayerTimer from "./timer/player-timer.component";
 import OpponentTimer from "./timer/opponent-timer.component";
 import PlayerDeck from "./decks/player-deck.component";
 import OpponentDeck from "./decks/opponent-deck.component";
 import Choices from "./choices/choices.component";
+import Grid from "./grid/grid.component";
 
 const OpponentInfos = () => {
   return (
@@ -18,14 +18,6 @@ const OpponentScore = () => {
   return (
     <View style={styles.opponentScoreContainer}>
       <Text>Score: </Text>
-    </View>
-  );
-};
-
-const Grid = () => {
-  return (
-    <View style={styles.gridContainer}>
-      <Text>Grid</Text>
     </View>
   );
 };

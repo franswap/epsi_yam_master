@@ -12,24 +12,50 @@ const DECK_INIT = {
   rollsMaximum: 3,
 };
 
-const GAME_INIT = {
-  gameState: {
-    currentTurn: "player:1",
-    timer: TURN_DURATION,
-    player1Score: 0,
-    player2Score: 0,
-    grid: [],
-    choices: {},
-    deck: {},
-  },
-};
-
 const CHOICES_INIT = {
   isDefi: false,
   isSec: false,
   idSelectedChoice: null,
   availableChoices: [],
 };
+
+const GRID_INIT = [
+  [
+    { viewContent: "1", id: "brelan1", owner: null, canBeChecked: false },
+    { viewContent: "3", id: "brelan3", owner: null, canBeChecked: false },
+    { viewContent: "Défi", id: "defi", owner: null, canBeChecked: false },
+    { viewContent: "4", id: "brelan4", owner: null, canBeChecked: false },
+    { viewContent: "6", id: "brelan6", owner: null, canBeChecked: false },
+  ],
+  [
+    { viewContent: "2", id: "brelan2", owner: null, canBeChecked: false },
+    { viewContent: "Carré", id: "carre", owner: null, canBeChecked: false },
+    { viewContent: "Sec", id: "sec", owner: null, canBeChecked: false },
+    { viewContent: "Full", id: "full", owner: null, canBeChecked: false },
+    { viewContent: "5", id: "brelan5", owner: null, canBeChecked: false },
+  ],
+  [
+    { viewContent: "≤8", id: "moinshuit", owner: null, canBeChecked: false },
+    { viewContent: "Full", id: "full", owner: null, canBeChecked: false },
+    { viewContent: "Yam", id: "yam", owner: null, canBeChecked: false },
+    { viewContent: "Défi", id: "defi", owner: null, canBeChecked: false },
+    { viewContent: "Suite", id: "suite", owner: null, canBeChecked: false },
+  ],
+  [
+    { viewContent: "6", id: "brelan6", owner: null, canBeChecked: false },
+    { viewContent: "Sec", id: "sec", owner: null, canBeChecked: false },
+    { viewContent: "Suite", id: "suite", owner: null, canBeChecked: false },
+    { viewContent: "≤8", id: "moinshuit", owner: null, canBeChecked: false },
+    { viewContent: "1", id: "brelan1", owner: null, canBeChecked: false },
+  ],
+  [
+    { viewContent: "3", id: "brelan3", owner: null, canBeChecked: false },
+    { viewContent: "2", id: "brelan2", owner: null, canBeChecked: false },
+    { viewContent: "Carré", id: "carre", owner: null, canBeChecked: false },
+    { viewContent: "5", id: "brelan5", owner: null, canBeChecked: false },
+    { viewContent: "4", id: "brelan4", owner: null, canBeChecked: false },
+  ],
+];
 
 const ALL_COMBINATIONS = [
   { value: "Brelan1", id: "brelan1" },
@@ -47,6 +73,19 @@ const ALL_COMBINATIONS = [
   { value: "Défi", id: "defi" },
 ];
 
+const GAME_INIT = {
+  gameState: {
+    currentTurn: "player:1",
+    timer: TURN_DURATION,
+    player1Score: 0,
+    player2Score: 0,
+    winner: null,
+    grid: [],
+    choices: {},
+    deck: {},
+  },
+};
+
 const GameService = {
   init: {
     // Init first level of structure of 'gameState' object
@@ -55,6 +94,7 @@ const GameService = {
       game["gameState"]["timer"] = TURN_DURATION;
       game["gameState"]["deck"] = { ...DECK_INIT };
       game["gameState"]["choices"] = { ...CHOICES_INIT };
+      game["gameState"]["grid"] = [...GRID_INIT];
       return game;
     },
     deck: () => {
@@ -62,6 +102,9 @@ const GameService = {
     },
     choices: () => {
       return { ...CHOICES_INIT };
+    },
+    grid: () => {
+      return { ...GRID_INIT };
     },
   },
 
@@ -123,7 +166,7 @@ const GameService = {
         };
       },
 
-      viewQueueState: () => {
+      queueViewState: () => {
         return {
           inQueue: true,
           inGame: false,
@@ -157,6 +200,15 @@ const GameService = {
           availableChoices: gameState.choices.availableChoices,
         };
         return choicesViewState;
+      },
+      gridViewState: (playerKey, gameState) => {
+        return {
+          displayGrid: true,
+          canSelectCells:
+            playerKey === gameState.currentTurn &&
+            gameState.choices.availableChoices.length > 0,
+          grid: gameState.grid,
+        };
       },
     },
   },
@@ -249,6 +301,52 @@ const GameService = {
       console.log("sum", sum);
       console.log("isLessThanEqual8", isLessThanEqual8);
       return availableCombinations;
+    },
+  },
+
+  grid: {
+    // La grille retournée doit avoir le flag 'canBeChecked' de toutes les cases de la 'grid' à 'false'
+    resetcanBeCheckedCells: (grid) => {
+      const updatedGrid = grid.map((row) =>
+        row.map((cell) => ({ ...cell, canBeChecked: false }))
+      );
+      return updatedGrid;
+    },
+
+    // La grille retournée doit avoir toutes les 'cells' qui ont le même 'id' que le 'idSelectedChoice' à 'canBeChecked: true'
+    updateGridAfterSelectingChoice: (idSelectedChoice, grid) => {
+      const updatedGrid = grid.map((row) =>
+        row.map((cell) => {
+          if (cell.id === idSelectedChoice && cell.owner === null) {
+            return { ...cell, canBeChecked: true };
+          } else {
+            return cell;
+          }
+        })
+      );
+
+      return updatedGrid;
+    },
+
+    // La grille retournée doit avoir avoir la case selectionnée par le joueur du tour en cours à 'owner: currentTurn'
+    // Nous avons besoin de rowIndex et cellIndex pour différencier les deux combinaisons similaires du plateau
+    selectCell: (idCell, rowIndex, cellIndex, currentTurn, grid) => {
+      const updatedGrid = grid.map((row, rowIndexGrid) =>
+        row.map((cell, cellIndexGrid) => {
+          if (
+            cell.id === idCell &&
+            cell.owner === null &&
+            rowIndex === rowIndexGrid &&
+            cellIndex === cellIndexGrid
+          ) {
+            return { ...cell, owner: currentTurn };
+          } else {
+            return cell;
+          }
+        })
+      );
+
+      return updatedGrid;
     },
   },
 
