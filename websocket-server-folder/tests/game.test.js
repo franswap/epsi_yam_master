@@ -68,3 +68,39 @@ const grid = [
 
 const result = gameService.utils.calculateScore("player:1", grid);
 console.log(result);
+
+// Supposons que 'matrix' est votre matrice carrée
+let matrix = [
+  [1, 2, 3, 4],
+  [5, 6, 7, 8],
+  [9, 10, 11, 12],
+  [13, 14, 15, 16],
+];
+
+let diagonals = [];
+
+for (let i = 0; i < matrix.length; i++) {
+  let j = 0,
+    k = i;
+  let diagonal = [];
+  while (k >= 0) {
+    diagonal.push(matrix[k][j]);
+    k--;
+    j++;
+  }
+  diagonals.push(diagonal);
+}
+
+for (let j = 1; j < matrix[0].length; j++) {
+  let i = matrix.length - 1,
+    k = j;
+  let diagonal = [];
+  while (k < matrix[0].length) {
+    diagonal.push(matrix[i][k]);
+    i--;
+    k++;
+  }
+  diagonals.push(diagonal);
+}
+
+console.log(diagonals);
