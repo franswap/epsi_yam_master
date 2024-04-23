@@ -289,17 +289,7 @@ const GameService = {
           allCombinations.find((combination) => combination.id === "sec")
         );
       }
-      console.log("-------------------------");
-      console.log("availableCombinations", availableCombinations);
-      console.log("counts", counts);
-      console.log("hasPair", hasPair);
-      console.log("threeOfAKindValue", threeOfAKindValue);
-      console.log("hasThreeOfAKind", hasThreeOfAKind);
-      console.log("hasFourOfAKind", hasFourOfAKind);
-      console.log("hasFiveOfAKind", hasFiveOfAKind);
-      console.log("hasStraight", hasStraight);
-      console.log("sum", sum);
-      console.log("isLessThanEqual8", isLessThanEqual8);
+
       return availableCombinations;
     },
   },
@@ -381,7 +371,89 @@ const GameService = {
       }
       return -1;
     },
+    calculateScore: (playerKey, grid) => {
+      function calculateAlignment(
+        grid,
+        rowIndex,
+        columIndex,
+        playerKey,
+        nbAlign,
+        nbMaxAlign
+      ) {
+        if (grid[rowIndex][columIndex].owner === playerKey) {
+          nbAlign++;
+          if (nbAlign > nbMaxAlign) nbMaxAlign = nbAlign;
+        } else nbAlign = 0;
+
+        return [nbAlign, nbMaxAlign];
+      }
+
+      let score = 0;
+      let nbRowAlign = 0;
+      let nbMaxRowAlign = 0;
+      let nbColumn = 0;
+      let nbMaxColumnAlign = 0;
+      let nbDiagonalAlign = 0;
+      let nbMaxDiagonalAlign = 0;
+      let nbAntiDiagonalAlign = 0;
+      let nbMaxAntiDiagonalAlign = 0;
+
+      for (let i = 0; i < grid.length; i++) {
+        nbRowAlign = 0;
+        nbMaxRowAlign = 0;
+        nbColumn = 0;
+        nbMaxColumnAlign = 0;
+
+        // Calculer le score par diagonale
+        [nbDiagonalAlign, nbMaxDiagonalAlign] = calculateAlignment(
+          grid,
+          i,
+          i,
+          playerKey,
+          nbDiagonalAlign,
+          nbMaxDiagonalAlign
+        );
+
+        // Calculer le score par anti-diagonale
+        [nbAntiDiagonalAlign, nbMaxAntiDiagonalAlign] = calculateAlignment(
+          grid,
+          i,
+          4 - i,
+          playerKey,
+          nbAntiDiagonalAlign,
+          nbMaxAntiDiagonalAlign
+        );
+
+        for (let j = 0; j < grid[i].length; j++) {
+          // Calculer le score par ligne
+          [nbRowAlign, nbMaxRowAlign] = calculateAlignment(
+            grid,
+            i,
+            j,
+            playerKey,
+            nbRowAlign,
+            nbMaxRowAlign
+          );
+
+          // Calculer le score par colonne
+          [nbColumn, nbMaxColumnAlign] = calculateAlignment(
+            grid,
+            j,
+            i,
+            playerKey,
+            nbColumn,
+            nbMaxColumnAlign
+          );
+        }
+        // console.log("nbMaxRowAlign", nbMaxRowAlign);
+        // console.log("nbMaxColumnAlign", nbMaxColumnAlign);
+        // console.log("nbMaxDiagonalAlign", nbMaxDiagonalAlign);
+        console.log("nbMaxAntiDiagonalAlign", nbMaxAntiDiagonalAlign);
+      }
+
+      return score;
+    },
   },
 };
 
-module.exports = GameService;
+export default GameService;

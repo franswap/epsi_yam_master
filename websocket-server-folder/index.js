@@ -1,8 +1,12 @@
-const app = require("express")();
-const http = require("http").Server(app);
-const io = require("socket.io")(http);
-var uniqid = require("uniqid");
-const GameService = require("./services/game.service.js");
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+import uniqid from "uniqid";
+import GameService from "./services/game.service.js";
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
 // ---------------------------------------------------
 // -------- CONSTANTS AND GLOBAL VARIABLES -----------
@@ -265,6 +269,46 @@ io.on("connection", (socket) => {
 
     // TODO: Ici calculer le score
     // TODO: Puis check si la partie s'arrête (lines / diagolales / no-more-gametokens)
+    //Décompte des points
+    // Un alignement horizontal, vertical ou en diagonale de trois pions rapporte 1 point.
+    // Un alignement de quatre pions rapporte 2 points.
+    // La partie s’achève lorsqu’un des joueurs n’a plus de pions (le joueur avec le plus de points est alors le vainqueur, les joueurs commencent la partie avec 12 pions à leur disposition) ou lorsqu’un des joueurs réalise un alignement de cinq pions (il gagne instantanément la partie).
+
+    // Calculate score
+    if (game.gameState.currentTurn === "player:1") {
+      game.gameState.player1Score = GameService.utils.calculateScore(
+        game.gameState.grid,
+        game.gameState.player1Score
+      );
+    } else if (game.gameState.currentTurn === "player:2") {
+      game.gameState.player2Score = GameService.utils.calculateScore(
+        game.gameState.grid,
+        game.gameState.player2Score
+      );
+    }
+
+    // Check if the game ends
+    // const hasNoMoreTokens = GameService.game.checkNoMoreTokens(game.gameState); // Plus de pions
+    // const hasFiveInARow = GameService.game.checkFiveInARow(game.gameState.grid); // 5 en ligne
+
+    // if (hasNoMoreTokens) {
+    //   game.gameState.winner =
+    //     game.gameState.player1Score > game.gameState.player2Score
+    //       ? "player:1"
+    //       : "player:2";
+    // } else if (hasFiveInARow) {
+    //   game.gameState.winner = game.gameState.currentTurn;
+    // }
+
+    // // Si la partie est terminée, on envoie l'événement game.winner aux joueurs
+    // if (game.gameState.winner) {
+    //   emitToPlayers(
+    //     game,
+    //     "game.winner",
+    //     GameService.send.forPlayer.gameViewState("player:1", game),
+    //     GameService.send.forPlayer.gameViewState("player:2", game)
+    //   );
+    // }
 
     // Sinon on finit le tour
     game.gameState.currentTurn =
@@ -293,6 +337,6 @@ io.on("connection", (socket) => {
 
 app.get("/", (req, res) => res.sendFile("index.html"));
 
-http.listen(3000, function () {
+server.listen(3000, function () {
   console.log("listening on *:3000");
 });
