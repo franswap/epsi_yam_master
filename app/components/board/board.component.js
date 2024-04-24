@@ -6,6 +6,7 @@ import PlayerTimer from "./timers/player-timer.component";
 import OpponentTimer from "./timers/opponent-timer.component";
 import Choices from "./choices/choices.component";
 import Grid from "./grid/grid.component";
+import PlayerPawns from "./pawns/pawns.components";
 
 const OpponentInfos = () => {
   return (
@@ -35,6 +36,13 @@ const PlayerScore = () => {
   return (
     <View style={styles.playerScoreContainer}>
       <Text>PlayerScore</Text>
+    </View>
+  );
+}
+const PlayerPawn = () => {
+  return (
+    <View style={styles.playerPawnContainer}>
+      <Text>Nombre de pions :</Text>
     </View>
   );
 };
@@ -68,6 +76,7 @@ const Board = ({ gameViewState }) => {
         <View style={styles.playerTimerScoreContainer}>
           <PlayerTimer />
           <PlayerScore />
+          <PlayerPawns />
         </View>
       </View>
     </View>

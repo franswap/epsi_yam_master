@@ -182,6 +182,14 @@ const GameService = {
           gameState.currentTurn === playerKey ? 0 : gameState.timer;
         return { playerTimer: playerTimer, opponentTimer: opponentTimer };
       },
+      gamePawns: (playerKey, gameState) => {
+        // Selon la clé du joueur on adapte la réponse (player / opponent)
+        const playerPawns =
+          gameState.currentTurn === playerKey ? gameState.player2Pawns : gameState.player1Pawns;
+        const opponentPawns =
+          gameState.currentTurn === playerKey ? gameState.player1Pawns : gameState.player2Pawns;
+        return { playerPawns: playerPawns, opponentPawns: opponentPawns };
+      },
       deckViewState: (playerKey, gameState) => {
         const deckViewState = {
           displayPlayerDeck: gameState.currentTurn === playerKey,
