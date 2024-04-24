@@ -40,6 +40,14 @@ const updateClientsViewTimers = (game) =>
     GameService.send.forPlayer.gameTimer("player:2", game.gameState)
   );
 
+const updateClientsViewPawns = (game) =>
+  emitToPlayers(
+    game,
+    "game.pawns",
+    GameService.send.forPlayer.gamePawns("player:1", game.gameState),
+    GameService.send.forPlayer.gamePawns("player:2", game.gameState)
+  );
+
 const updateClientsViewDecks = (game) =>
   setTimeout(() => {
     emitToPlayers(
@@ -70,6 +78,15 @@ const updateClientsViewGrid = (game) =>
     );
   }, 50);
 
+function updateClientsViewScore(game) {
+  emitToPlayers(
+    game,
+    "score.update",
+    GameService.send.forPlayer.gameTimer("player:1", game.gameState),
+    GameService.send.forPlayer.gameTimer("player:2", game.gameState)
+  )
+}
+
 const updateGameInterval = (game) => {
   game.gameState.timer--;
 
@@ -94,6 +111,10 @@ const updateGameInterval = (game) => {
   }
   // Update clients view timers
   updateClientsViewTimers(game);
+
+  // Update clients view pawns
+  updateClientsViewPawns(game);
+  updateClientsViewScore(game);
 };
 
 const handlePlayersDisconnects = (game, gameInterval) => {
@@ -297,8 +318,8 @@ io.on("connection", (socket) => {
     }
 
     // Check if the game ends
-    const hasNoMoreTokens = GameService.game.checkNoMoreTokens(game.gameState); // Plus de pions
-    const hasFiveInARow = GameService.game.checkFiveInARow(game.gameState.grid); // 5 en ligne
+    const hasNoMoreTokens = (game.gameState.player1Pawns == 0) || (game.gameState.player2Pawns == 0); // Plus de pions
+    const hasFiveInARow = false // GameService.game.checkFiveInARow(game.gameState.grid); // 5 en ligne
 
     if (hasNoMoreTokens) {
       game.gameState.winner =
