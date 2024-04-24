@@ -405,24 +405,24 @@ const GameService = {
         nbMaxColumnAlign = 0;
 
         // Calculer le score par diagonale
-        [nbDiagonalAlign, nbMaxDiagonalAlign] = calculateAlignment(
-          grid,
-          i,
-          i,
-          playerKey,
-          nbDiagonalAlign,
-          nbMaxDiagonalAlign
-        );
+        // [nbDiagonalAlign, nbMaxDiagonalAlign] = calculateAlignment(
+        //   grid,
+        //   i,
+        //   i,
+        //   playerKey,
+        //   nbDiagonalAlign,
+        //   nbMaxDiagonalAlign
+        // );
 
         // Calculer le score par anti-diagonale
-        [nbAntiDiagonalAlign, nbMaxAntiDiagonalAlign] = calculateAlignment(
-          grid,
-          i,
-          4 - i,
-          playerKey,
-          nbAntiDiagonalAlign,
-          nbMaxAntiDiagonalAlign
-        );
+        // [nbAntiDiagonalAlign, nbMaxAntiDiagonalAlign] = calculateAlignment(
+        //   grid,
+        //   i,
+        //   4 - i,
+        //   playerKey,
+        //   nbAntiDiagonalAlign,
+        //   nbMaxAntiDiagonalAlign
+        // );
 
         for (let j = 0; j < grid[i].length; j++) {
           // Calculer le score par ligne
@@ -444,11 +444,23 @@ const GameService = {
             nbColumn,
             nbMaxColumnAlign
           );
+
+          // Calculer le score par diagonale
+          // if (j >= 2) console.log("i", grid[i][j]);
         }
+
+        // Calculer le score par ligne
+        if (nbMaxRowAlign == 3) score += 1;
+        else if (nbMaxRowAlign == 4) score += 2;
+
+        // Calculer le score par colonne
+        if (nbMaxColumnAlign == 3) score += 1;
+        else if (nbMaxColumnAlign == 4) score += 2;
+
         // console.log("nbMaxRowAlign", nbMaxRowAlign);
         // console.log("nbMaxColumnAlign", nbMaxColumnAlign);
         // console.log("nbMaxDiagonalAlign", nbMaxDiagonalAlign);
-        console.log("nbMaxAntiDiagonalAlign", nbMaxAntiDiagonalAlign);
+        // console.log("nbMaxAntiDiagonalAlign", nbMaxAntiDiagonalAlign);
       }
 
       return score;

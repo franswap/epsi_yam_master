@@ -277,14 +277,16 @@ io.on("connection", (socket) => {
     // Calculate score
     if (game.gameState.currentTurn === "player:1") {
       game.gameState.player1Score = GameService.utils.calculateScore(
-        game.gameState.grid,
-        game.gameState.player1Score
+        game.gameState.currentTurn,
+        game.gameState.grid
       );
+      console.log("joueur1", game.gameState.player1Score);
     } else if (game.gameState.currentTurn === "player:2") {
       game.gameState.player2Score = GameService.utils.calculateScore(
-        game.gameState.grid,
-        game.gameState.player2Score
+        game.gameState.currentTurn,
+        game.gameState.grid
       );
+      console.log("joueur2", game.gameState.player2Score);
     }
 
     // Check if the game ends
