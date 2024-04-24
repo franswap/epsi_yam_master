@@ -185,9 +185,13 @@ const GameService = {
       gamePawns: (playerKey, gameState) => {
         // Selon la clé du joueur on adapte la réponse (player / opponent)
         const playerPawns =
-          gameState.currentTurn === playerKey ? gameState.player2Pawns : gameState.player1Pawns;
+          gameState.currentTurn === playerKey
+            ? gameState.player2Pawns
+            : gameState.player1Pawns;
         const opponentPawns =
-          gameState.currentTurn === playerKey ? gameState.player1Pawns : gameState.player2Pawns;
+          gameState.currentTurn === playerKey
+            ? gameState.player1Pawns
+            : gameState.player2Pawns;
         return { playerPawns: playerPawns, opponentPawns: opponentPawns };
       },
       deckViewState: (playerKey, gameState) => {
@@ -247,29 +251,23 @@ const GameService = {
       }
 
       // Vérifier les combinaisons possibles
-      counts.forEach((count) => {
-        // Paire
-        if (count === 2) {
+      for (let i = 1; i <= 6; i++) {
+        if (counts[i] === 2) {
           hasPair = true;
-        }
-        // Brelan
-        else if (count === 3) {
-          threeOfAKindValue = count;
+        } else if (counts[i] === 3) {
+          threeOfAKindValue = i;
           hasThreeOfAKind = true;
-        }
-        // Carré
-        else if (count === 4) {
-          threeOfAKindValue = count;
+        } else if (counts[i] === 4) {
+          threeOfAKindValue = i;
           hasThreeOfAKind = true;
           hasFourOfAKind = true;
-        } // Yam
-        else if (count === 5) {
-          threeOfAKindValue = count;
+        } else if (counts[i] === 5) {
+          threeOfAKindValue = i;
           hasThreeOfAKind = true;
           hasFourOfAKind = true;
           hasFiveOfAKind = true;
         }
-      });
+      }
       if (counts.slice(1).join("").includes("11111")) hasStraight = true; // Suite
       if (sum <= 8) isLessThanEqual8 = true; // ≤8
 
