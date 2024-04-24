@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     width: '100%',
     borderBottomWidth: 1,
     borderColor: 'black',
