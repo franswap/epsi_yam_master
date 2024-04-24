@@ -395,36 +395,12 @@ const GameService = {
       let nbMaxRowAlign = 0;
       let nbColumn = 0;
       let nbMaxColumnAlign = 0;
-      let nbDiagonalAlign = 0;
-      let nbMaxDiagonalAlign = 0;
-      let nbAntiDiagonalAlign = 0;
-      let nbMaxAntiDiagonalAlign = 0;
 
       for (let i = 0; i < grid.length; i++) {
         nbRowAlign = 0;
         nbMaxRowAlign = 0;
         nbColumn = 0;
         nbMaxColumnAlign = 0;
-
-        // Calculer le score par diagonale
-        // [nbDiagonalAlign, nbMaxDiagonalAlign] = calculateAlignment(
-        //   grid,
-        //   i,
-        //   i,
-        //   playerKey,
-        //   nbDiagonalAlign,
-        //   nbMaxDiagonalAlign
-        // );
-
-        // Calculer le score par anti-diagonale
-        // [nbAntiDiagonalAlign, nbMaxAntiDiagonalAlign] = calculateAlignment(
-        //   grid,
-        //   i,
-        //   4 - i,
-        //   playerKey,
-        //   nbAntiDiagonalAlign,
-        //   nbMaxAntiDiagonalAlign
-        // );
 
         for (let j = 0; j < grid[i].length; j++) {
           // Calculer le score par ligne
@@ -446,9 +422,6 @@ const GameService = {
             nbColumn,
             nbMaxColumnAlign
           );
-
-          // Calculer le score par diagonale
-          // if (j >= 2) console.log("i", grid[i][j]);
         }
 
         // Calculer le score par ligne
@@ -461,8 +434,58 @@ const GameService = {
 
         // console.log("nbMaxRowAlign", nbMaxRowAlign);
         // console.log("nbMaxColumnAlign", nbMaxColumnAlign);
+      }
+
+      let nbDiagonalAlign = 0;
+      let nbMaxDiagonalAlign = 0;
+      let nbAntiDiagonalAlign = 0;
+      let nbMaxAntiDiagonalAlign = 0;
+
+      // Calculer le score par diagonale
+      let rows = grid.length;
+      let cols = grid[0].length;
+
+      for (let slice = 0; slice < rows + cols - 1; ++slice) {
+        let z1 = slice < cols ? 0 : slice - cols + 1;
+        let z2 = slice < rows ? 0 : slice - rows + 1;
+
+        nbDiagonalAlign = 0;
+        nbMaxDiagonalAlign = 0;
+        nbAntiDiagonalAlign = 0;
+        nbMaxAntiDiagonalAlign = 0;
+
+        for (let j = slice - z2; j >= z1; --j) {
+          // Diagonale
+          [nbDiagonalAlign, nbMaxDiagonalAlign] = calculateAlignment(
+            grid,
+            j,
+            slice - j,
+            playerKey,
+            nbDiagonalAlign,
+            nbMaxDiagonalAlign
+          );
+
+          // Anti-diagonale
+          [nbAntiDiagonalAlign, nbMaxAntiDiagonalAlign] = calculateAlignment(
+            grid,
+            rows - 1 - j,
+            slice - j,
+            playerKey,
+            nbAntiDiagonalAlign,
+            nbMaxAntiDiagonalAlign
+          );
+        }
+
         // console.log("nbMaxDiagonalAlign", nbMaxDiagonalAlign);
         // console.log("nbMaxAntiDiagonalAlign", nbMaxAntiDiagonalAlign);
+
+        // Calculer le score par diagonale
+        if (nbMaxDiagonalAlign == 3) score += 1;
+        else if (nbMaxDiagonalAlign == 4) score += 2;
+
+        // Calculer le score par anti-diagonale
+        if (nbMaxAntiDiagonalAlign == 3) score += 1;
+        else if (nbMaxAntiDiagonalAlign == 4) score += 2;
       }
 
       return score;
