@@ -78,6 +78,15 @@ const updateClientsViewGrid = (game) =>
     );
   }, 50);
 
+function updateClientsViewScore(game) {
+  emitToPlayers(
+    game,
+    "score.update",
+    GameService.send.forPlayer.gameTimer("player:1", game.gameState),
+    GameService.send.forPlayer.gameTimer("player:2", game.gameState)
+  )
+}
+
 const updateGameInterval = (game) => {
   game.gameState.timer--;
 
@@ -105,6 +114,7 @@ const updateGameInterval = (game) => {
 
   // Update clients view pawns
   updateClientsViewPawns(game);
+  updateClientsViewScore(game);
 };
 
 const handlePlayersDisconnects = (game, gameInterval) => {
