@@ -79,6 +79,8 @@ const GAME_INIT = {
     timer: TURN_DURATION,
     player1Score: 0,
     player2Score: 0,
+    player1Pawns: 12,
+    player2Pawns: 12,
     winner: null,
     grid: [],
     choices: {},

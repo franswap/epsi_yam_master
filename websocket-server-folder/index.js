@@ -267,6 +267,13 @@ io.on("connection", (socket) => {
       game.gameState.grid
     );
 
+    // decrementation des pionts lorsqu'un joueur en place un.
+    if (game.gameState.currentTurn === "player:1") {
+      game.gameState.player1Pawns--;
+    } else if (game.gameState.currentTurn === "player:2") {
+      game.gameState.player2Pawns--;
+    }
+
     // TODO: Ici calculer le score
     // TODO: Puis check si la partie s'arrête (lines / diagolales / no-more-gametokens)
     //Décompte des points
@@ -290,27 +297,27 @@ io.on("connection", (socket) => {
     }
 
     // Check if the game ends
-    // const hasNoMoreTokens = GameService.game.checkNoMoreTokens(game.gameState); // Plus de pions
-    // const hasFiveInARow = GameService.game.checkFiveInARow(game.gameState.grid); // 5 en ligne
+    const hasNoMoreTokens = GameService.game.checkNoMoreTokens(game.gameState); // Plus de pions
+    const hasFiveInARow = GameService.game.checkFiveInARow(game.gameState.grid); // 5 en ligne
 
-    // if (hasNoMoreTokens) {
-    //   game.gameState.winner =
-    //     game.gameState.player1Score > game.gameState.player2Score
-    //       ? "player:1"
-    //       : "player:2";
-    // } else if (hasFiveInARow) {
-    //   game.gameState.winner = game.gameState.currentTurn;
-    // }
+    if (hasNoMoreTokens) {
+      game.gameState.winner =
+        game.gameState.player1Score > game.gameState.player2Score
+          ? "player:1"
+          : "player:2";
+    } else if (hasFiveInARow) {
+      game.gameState.winner = game.gameState.currentTurn;
+    }
 
-    // // Si la partie est terminée, on envoie l'événement game.winner aux joueurs
-    // if (game.gameState.winner) {
-    //   emitToPlayers(
-    //     game,
-    //     "game.winner",
-    //     GameService.send.forPlayer.gameViewState("player:1", game),
-    //     GameService.send.forPlayer.gameViewState("player:2", game)
-    //   );
-    // }
+    // Si la partie est terminée, on envoie l'événement game.winner aux joueurs
+    if (game.gameState.winner) {
+      emitToPlayers(
+        game,
+        "game.winner",
+        GameService.send.forPlayer.gameViewState("player:1", game),
+        GameService.send.forPlayer.gameViewState("player:2", game)
+      );
+    }
 
     // Sinon on finit le tour
     game.gameState.currentTurn =
