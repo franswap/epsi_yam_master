@@ -9,7 +9,7 @@ const grid = [
     { viewContent: "6", id: "brelan6", owner: "player:1", canBeChecked: false },
   ],
   [
-    { viewContent: "2", id: "brelan2", owner: null, canBeChecked: false },
+    { viewContent: "2", id: "brelan2", owner: "player:1", canBeChecked: false },
     {
       viewContent: "Carré",
       id: "carre",
@@ -104,3 +104,25 @@ for (let j = 1; j < matrix[0].length; j++) {
 }
 
 console.log(diagonals);
+
+const displayGrid = (grid) => {
+  let output = "";
+  for (let row of grid) {
+    let rowOutput = "| ";
+    for (let cell of row) {
+      if (cell.owner === "player:1") {
+        rowOutput += "X | ";
+      } else if (cell.owner === "player:2") {
+        rowOutput += "O | ";
+      } else {
+        rowOutput += "  | ";
+      }
+    }
+    output += rowOutput + "\n";
+    output += "-".repeat(rowOutput.length) + "\n";
+  }
+  console.log(output);
+};
+
+// Utilisation de la fonction
+displayGrid(grid);
