@@ -2,8 +2,8 @@ import React from "react";
 import { View, Text, StyleSheet } from 'react-native';
 import PlayerDeck from "./decks/player-deck.component";
 import OpponentDeck from "./decks/opponent-deck.component";
-import PlayerTimer from "./timers/player-timer.component";
-import OpponentTimer from "./timers/opponent-timer.component";
+import PlayerTimer from "./timer/player-timer.component";
+import OpponentTimer from "./timer/opponent-timer.component";
 import Choices from "./choices/choices.component";
 import Grid from "./grid/grid.component";
 
