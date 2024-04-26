@@ -82,9 +82,13 @@ function updateClientsViewScore(game) {
   emitToPlayers(
     game,
     "score.update",
-    GameService.send.forPlayer.gameTimer("player:1", game.gameState),
-    GameService.send.forPlayer.gameTimer("player:2", game.gameState)
+    GameService.send.forPlayer.gameScore("player:1", game.gameState),
+    GameService.send.forPlayer.gameScore("player:2", game.gameState)
   );
+}
+
+function updateClientsViewEnd(game) {
+  emitToPlayers(game, "game.end", GameService.send.forPlayer.gameSummary());
 }
 
 const updateGameInterval = (game) => {
@@ -114,7 +118,12 @@ const updateGameInterval = (game) => {
 
   // Update clients view pawns
   updateClientsViewPawns(game);
+
+  // Update View Score
   updateClientsViewScore(game);
+
+  // Update End Game
+  updateClientsViewEnd(game);
 };
 
 const handlePlayersDisconnects = (game, gameInterval) => {

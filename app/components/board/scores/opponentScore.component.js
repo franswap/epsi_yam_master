@@ -8,7 +8,7 @@ const OpponentScore = () => {
 
     useEffect(() => {
         socket.on("score.update", (data) => {
-            setOpponentScore(data["player2Score"]);
+            setOpponentScore(data["opponentScore"]);
         });
     }, []);
 

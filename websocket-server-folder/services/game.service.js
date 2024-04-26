@@ -194,6 +194,18 @@ const GameService = {
             : gameState.player2Pawns;
         return { playerPawns: playerPawns, opponentPawns: opponentPawns };
       },
+      gameScore: (playerKey, gameState) => {
+        // Selon la clé du joueur on adapte la réponse (player / opponent)
+        const playerScore =
+          playerKey === "player:1"
+            ? gameState.player1Score
+            : gameState.player2Score;
+        const opponentScore =
+          playerKey === "player:1"
+            ? gameState.player2Score
+            : gameState.player1Score;
+        return { playerScore, opponentScore };
+      },
       deckViewState: (playerKey, gameState) => {
         const deckViewState = {
           displayPlayerDeck: gameState.currentTurn === playerKey,
@@ -223,6 +235,23 @@ const GameService = {
             gameState.choices.availableChoices.length > 0,
           grid: gameState.grid,
         };
+      },
+      gameSummary: (gameState) => {
+        // Déterminer le vainqueur et le perdant
+        let loser = gameState.winner === "player:1" ? "player:2" : "player:1";
+
+        // Créer le résumé de la partie
+        const gameSummary = {
+          winner: gameState.winner,
+          loser: !gameState.winner,
+          scores: {
+            player1Score: gameState.player1Score,
+            player2Score: gameState.player2Score,
+          },
+          // Ajoutez ici toute autre information que vous voulez inclure
+        };
+
+        return gameSummary;
       },
     },
   },
