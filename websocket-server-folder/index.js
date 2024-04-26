@@ -84,7 +84,7 @@ function updateClientsViewScore(game) {
     "score.update",
     GameService.send.forPlayer.gameTimer("player:1", game.gameState),
     GameService.send.forPlayer.gameTimer("player:2", game.gameState)
-  )
+  );
 }
 
 const updateGameInterval = (game) => {
@@ -288,47 +288,24 @@ io.on("connection", (socket) => {
       game.gameState.grid
     );
 
-    // decrementation des pionts lorsqu'un joueur en place un.
+    // Calcul du score
+    const playerCurrentTurnScore = GameService.utils.calculateScore(
+      game.gameState.currentTurn,
+      game.gameState.grid
+    );
+
+    // Décrementation des pionts lorsqu'un joueur en place un + Mise à jour du score
     if (game.gameState.currentTurn === "player:1") {
       game.gameState.player1Pawns--;
+      game.gameState.player1Score = playerCurrentTurnScore;
     } else if (game.gameState.currentTurn === "player:2") {
       game.gameState.player2Pawns--;
+      game.gameState.player2Score = playerCurrentTurnScore;
     }
 
-    // TODO: Ici calculer le score
-    // TODO: Puis check si la partie s'arrête (lines / diagolales / no-more-gametokens)
-    //Décompte des points
-    // Un alignement horizontal, vertical ou en diagonale de trois pions rapporte 1 point.
-    // Un alignement de quatre pions rapporte 2 points.
-    // La partie s’achève lorsqu’un des joueurs n’a plus de pions (le joueur avec le plus de points est alors le vainqueur, les joueurs commencent la partie avec 12 pions à leur disposition) ou lorsqu’un des joueurs réalise un alignement de cinq pions (il gagne instantanément la partie).
-
-    // Calculate score
-    if (game.gameState.currentTurn === "player:1") {
-      game.gameState.player1Score = GameService.utils.calculateScore(
-        game.gameState.currentTurn,
-        game.gameState.grid
-      );
-      console.log("joueur1", game.gameState.player1Score);
-    } else if (game.gameState.currentTurn === "player:2") {
-      game.gameState.player2Score = GameService.utils.calculateScore(
-        game.gameState.currentTurn,
-        game.gameState.grid
-      );
-      console.log("joueur2", game.gameState.player2Score);
-    }
-
-    // Check if the game ends
-    const hasNoMoreTokens = (game.gameState.player1Pawns == 0) || (game.gameState.player2Pawns == 0); // Plus de pions
-    const hasFiveInARow = false // GameService.game.checkFiveInARow(game.gameState.grid); // 5 en ligne
-
-    if (hasNoMoreTokens) {
-      game.gameState.winner =
-        game.gameState.player1Score > game.gameState.player2Score
-          ? "player:1"
-          : "player:2";
-    } else if (hasFiveInARow) {
-      game.gameState.winner = game.gameState.currentTurn;
-    }
+    // Puis check si la partie s'arrête (lines / diagolales / no-more-gametokens)
+    const hasNoMoreTokens =
+      game.gameState.player1Pawns === 0 || game.gameState.player2Pawns === 0; // Plus de pions
 
     // Si la partie est terminée, on envoie l'événement game.winner aux joueurs
     if (game.gameState.winner) {
@@ -338,6 +315,14 @@ io.on("connection", (socket) => {
         GameService.send.forPlayer.gameViewState("player:1", game),
         GameService.send.forPlayer.gameViewState("player:2", game)
       );
+    } else if (hasNoMoreTokens) {
+      if (game.gameState.player1Score > game.gameState.player2Score) {
+        game.gameState.winner = "player:1";
+      } else if (game.gameState.player1Score < game.gameState.player2Score) {
+        game.gameState.winner = "player:2";
+      } else {
+        game.gameState.winner = null;
+      }
     }
 
     // Sinon on finit le tour
