@@ -14,6 +14,10 @@ export default function HomeScreen({ navigation }) {
           title="Jouer contre le bot"
           onPress={() => navigation.navigate("VsBotGameScreen")}
         />
+        <Button
+          title="TEST"
+          onPress={() => navigation.navigate("GameSummaryScreen")}
+        />
       </View>
     </View>
   );
