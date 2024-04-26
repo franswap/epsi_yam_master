@@ -12,13 +12,13 @@ export default function OnlineGameController({ navigation }) {
 
   // Écouter l'événement 'game.end'
   useEffect(() => {
-    socket.on('game.end', (gameSummary) => {
-      navigation.navigate('GameSummaryScreen', { gameSummary: gameSummary });
+    socket.on("game.end", (data) => {
+      navigation.navigate("GameSummaryScreen", { data });
     });
 
     // Supprimer l'écouteur d'événement lorsque le composant est démonté
     return () => {
-      socket.off('game.end');
+      socket.off("game.end");
     };
   }, [navigation, socket]);
 

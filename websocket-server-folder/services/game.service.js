@@ -237,18 +237,14 @@ const GameService = {
         };
       },
       gameSummary: (gameState) => {
-        // Déterminer le vainqueur et le perdant
-        let loser = gameState.winner === "player:1" ? "player:2" : "player:1";
-
         // Créer le résumé de la partie
         const gameSummary = {
           winner: gameState.winner,
-          loser: !gameState.winner,
+          loser: gameState.winner === "player:1" ? "player:2" : "player:1",
           scores: {
             player1Score: gameState.player1Score,
             player2Score: gameState.player2Score,
           },
-          // Ajoutez ici toute autre information que vous voulez inclure
         };
 
         return gameSummary;
