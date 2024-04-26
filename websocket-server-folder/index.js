@@ -16,7 +16,7 @@ let queue = [];
 let games = [];
 
 // ---------------------------------
-// -------- GAME METHODS -----------
+// -------- EMIT METHODS -----------
 // ---------------------------------
 
 const emitToPlayers = (game, event, argsPlayer1, argsPlayer2) => {
@@ -88,8 +88,17 @@ function updateClientsViewScore(game) {
 }
 
 function updateClientsViewEnd(game) {
-  emitToPlayers(game, "game.end", GameService.send.forPlayer.gameSummary());
+  emitToPlayers(
+    game,
+    "game.end",
+    GameService.send.forPlayer.gameSummary(game.gameState),
+    GameService.send.forPlayer.gameSummary(game.gameState)
+  );
 }
+
+// ---------------------------------
+// -------- GAME METHODS -----------
+// ---------------------------------
 
 const updateGameInterval = (game) => {
   game.gameState.timer--;
@@ -115,15 +124,6 @@ const updateGameInterval = (game) => {
   }
   // Update clients view timers
   updateClientsViewTimers(game);
-
-  // Update clients view pawns
-  updateClientsViewPawns(game);
-
-  // Update View Score
-  updateClientsViewScore(game);
-
-  // Update End Game
-  updateClientsViewEnd(game);
 };
 
 const handlePlayersDisconnects = (game, gameInterval) => {
@@ -273,6 +273,8 @@ io.on("connection", (socket) => {
       game.gameState.grid
     );
 
+    updateClientsViewPawns(game);
+    updateClientsViewScore(game);
     updateClientsViewChoices(game);
     updateClientsViewGrid(game);
   });
@@ -298,7 +300,7 @@ io.on("connection", (socket) => {
     );
 
     // Calcul du score
-    const playerCurrentTurnScore = GameService.utils.calculateScore(
+    const { playerCurrentTurnScore, winner } = GameService.utils.calculateScore(
       game.gameState.currentTurn,
       game.gameState.grid
     );
@@ -316,15 +318,7 @@ io.on("connection", (socket) => {
     const hasNoMoreTokens =
       game.gameState.player1Pawns === 0 || game.gameState.player2Pawns === 0; // Plus de pions
 
-    // Si la partie est terminée, on envoie l'événement game.winner aux joueurs
-    if (game.gameState.winner) {
-      emitToPlayers(
-        game,
-        "game.winner",
-        GameService.send.forPlayer.gameViewState("player:1", game),
-        GameService.send.forPlayer.gameViewState("player:2", game)
-      );
-    } else if (hasNoMoreTokens) {
+    if (hasNoMoreTokens || winner) {
       if (game.gameState.player1Score > game.gameState.player2Score) {
         game.gameState.winner = "player:1";
       } else if (game.gameState.player1Score < game.gameState.player2Score) {
@@ -334,9 +328,15 @@ io.on("connection", (socket) => {
       }
     }
 
+    // Si la partie est terminée, on envoie l'événement game.winner aux joueurs
+    if (game.gameState.winner || hasNoMoreTokens) {
+      updateClientsViewEnd(game);
+    }
+
     // Sinon on finit le tour
-    game.gameState.currentTurn =
-      game.gameState.currentTurn === "player:1" ? "player:2" : "player:1";
+    else
+      game.gameState.currentTurn =
+        game.gameState.currentTurn === "player:1" ? "player:2" : "player:1";
 
     // On remet le timer, le deck et les choix par défaut (la grille ne change pas)
     game.gameState.timer = GameService.timer.getTurnDuration();
