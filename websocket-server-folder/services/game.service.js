@@ -21,9 +21,9 @@ const CHOICES_INIT = {
 
 const GRID_INIT = [
   [
-    { viewContent: "1", id: "brelan1", owner: null, canBeChecked: false },
-    { viewContent: "3", id: "brelan3", owner: null, canBeChecked: false },
-    { viewContent: "Défi", id: "defi", owner: null, canBeChecked: false },
+    { viewContent: "1", id: "brelan1", owner: "player:1", canBeChecked: false },
+    { viewContent: "3", id: "brelan3", owner: "player:1", canBeChecked: false },
+    { viewContent: "Défi", id: "defi", owner: "player:1", canBeChecked: false },
     { viewContent: "4", id: "brelan4", owner: null, canBeChecked: false },
     { viewContent: "6", id: "brelan6", owner: null, canBeChecked: false },
   ],
@@ -193,6 +193,12 @@ const GameService = {
             ? gameState.player1Pawns
             : gameState.player2Pawns;
         return { playerPawns: playerPawns, opponentPawns: opponentPawns };
+      },
+      gameScore: (playerKey, gameState) => {
+        // Selon la clé du joueur on adapte la réponse (player / opponent)
+        const playerScore = playerKey === "player:1" ? gameState.player1Score : gameState.player2Score;
+        const opponentScore = playerKey === "player:1" ? gameState.player2Score : gameState.player1Score;
+        return { playerScore, opponentScore };
       },
       deckViewState: (playerKey, gameState) => {
         const deckViewState = {
