@@ -82,8 +82,8 @@ function updateClientsViewScore(game) {
   emitToPlayers(
     game,
     "score.update",
-    GameService.send.forPlayer.gameTimer("player:1", game.gameState),
-    GameService.send.forPlayer.gameTimer("player:2", game.gameState)
+    GameService.send.forPlayer.gameScore("player:1", game.gameState),
+    GameService.send.forPlayer.gameScore("player:2", game.gameState)
   )
 }
 
