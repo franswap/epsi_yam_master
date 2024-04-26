@@ -87,6 +87,14 @@ function updateClientsViewScore(game) {
   )
 }
 
+function updateClientsViewEnd(game) {
+  emitToPlayers(
+    game,
+    "game.end",
+    GameService.send.forPlayer.gameSummary(),
+  )
+}
+
 const updateGameInterval = (game) => {
   game.gameState.timer--;
 
@@ -114,7 +122,12 @@ const updateGameInterval = (game) => {
 
   // Update clients view pawns
   updateClientsViewPawns(game);
+
+  // Update View Score
   updateClientsViewScore(game);
+
+  // Update End Game
+  updateClientsViewEnd(game)
 };
 
 const handlePlayersDisconnects = (game, gameInterval) => {

@@ -10,6 +10,18 @@ export default function OnlineGameController({ navigation }) {
   const [inGame, setInGame] = useState(false);
   const [idOpponent, setIdOpponent] = useState(null);
 
+  // Écouter l'événement 'game.end'
+  useEffect(() => {
+    socket.on('game.end', (gameSummary) => {
+      navigation.navigate('GameSummaryScreen', { gameSummary: gameSummary });
+    });
+
+    // Supprimer l'écouteur d'événement lorsque le composant est démonté
+    return () => {
+      socket.off('game.end');
+    };
+  }, [navigation, socket]);
+
   // fonction pour quitter la queue
   const leaveQueue = () => {
     console.log("[emit][queue.leave]:", socket.id);

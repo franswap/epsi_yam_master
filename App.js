@@ -6,6 +6,7 @@ import { SocketContext, socket } from "./app/contexts/socket.context";
 import HomeScreen from "./app/screens/home.screen";
 import OnlineGameScreen from "./app/screens/online-game.screen";
 import VsBotGameScreen from "./app/screens/vs-bot-game.screen";
+import GameSummaryScreen from "./app/screens/gameSummaryScreen";
 
 const Stack = createStackNavigator();
 LogBox.ignoreAllLogs(true);
@@ -18,6 +19,7 @@ function App() {
           <Stack.Screen name="HomeScreen" component={HomeScreen} />
           <Stack.Screen name="OnlineGameScreen" component={OnlineGameScreen} />
           <Stack.Screen name="VsBotGameScreen" component={VsBotGameScreen} />
+          <Stack.Screen name="GameSummaryScreen" component={GameSummaryScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SocketContext.Provider>
