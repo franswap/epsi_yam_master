@@ -236,11 +236,16 @@ const GameService = {
           grid: gameState.grid,
         };
       },
+      // Créer le résumé de la partie
       gameSummary: (gameState) => {
-        // Créer le résumé de la partie
+        const getLoser = (winner) => {
+          if (winner === null) return null;
+          return winner === "player:1" ? "player:2" : "player:1";
+        };
+
         const gameSummary = {
           winner: gameState.winner,
-          loser: gameState.winner === "player:1" ? "player:2" : "player:1",
+          loser: getLoser(gameState.winner),
           scores: {
             player1Score: gameState.player1Score,
             player2Score: gameState.player2Score,
@@ -421,7 +426,7 @@ const GameService = {
         return [nbAlign, nbMaxAlign];
       }
 
-      function addScore(nbMaxAlign) {
+      function calculatePoint(nbMaxAlign) {
         let score = 0;
         if (nbMaxAlign === 3) score = 1;
         else if (nbMaxAlign === 4) score = 2;
@@ -429,44 +434,34 @@ const GameService = {
         return score;
       }
 
-      function addScoreLineRow() {
+      function calculateScoreRowOrColumn(direction) {
         let score = 0;
-        for (let i = 0; i < grid.length; i++) {
-          let nbRowAlign = 0;
-          let nbMaxRowAlign = 0;
-          let nbColumn = 0;
-          let nbMaxColumnAlign = 0;
+        let nbRows = grid.length;
+        let nbCols = grid[0].length;
 
-          for (let j = 0; j < grid[i].length; j++) {
-            // Calculer le score par ligne
-            [nbRowAlign, nbMaxRowAlign] = calculateAlignment(
-              grid,
-              i,
-              j,
-              playerKey,
-              nbRowAlign,
-              nbMaxRowAlign
-            );
+        for (let i = 0; i < (direction === "row" ? nbRows : nbCols); i++) {
+          let nbAlign = 0;
+          let nbMaxAlign = 0;
 
-            // Calculer le score par colonne
-            [nbColumn, nbMaxColumnAlign] = calculateAlignment(
+          for (let j = 0; j < (direction === "row" ? nbCols : nbRows); j++) {
+            let rowIndex = direction === "row" ? i : j;
+            let columnIndex = direction === "row" ? j : i;
+            [nbAlign, nbMaxAlign] = calculateAlignment(
               grid,
-              j,
-              i,
+              rowIndex,
+              columnIndex,
               playerKey,
-              nbColumn,
-              nbMaxColumnAlign
+              nbAlign,
+              nbMaxAlign
             );
           }
 
-          // Calculer le score par ligne et colonne
-          score += addScore(nbMaxRowAlign);
-          score += addScore(nbMaxColumnAlign);
+          score += calculatePoint(nbMaxAlign);
         }
         return score;
       }
 
-      function addScoreDiagonals() {
+      function calculateScoreDiagonals() {
         let score = 0;
         let rows = grid.length;
         let cols = grid[0].length;
@@ -503,15 +498,16 @@ const GameService = {
           }
 
           // Ajout du score pour les diagonales et anti-diagonales
-          score += addScore(nbMaxDiagonalAlign);
-          score += addScore(nbMaxAntiDiagonalAlign);
+          score += calculatePoint(nbMaxDiagonalAlign);
+          score += calculatePoint(nbMaxAntiDiagonalAlign);
         }
         return score;
       }
 
       let winner = null;
-      let score = addScoreLineRow();
-      score += addScoreDiagonals();
+      let score = calculateScoreRowOrColumn("row");
+      score += calculateScoreRowOrColumn("column");
+      score += calculateScoreDiagonals();
 
       return { score, winner };
     },
