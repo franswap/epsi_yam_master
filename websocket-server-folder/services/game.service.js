@@ -175,84 +175,81 @@ const GameService = {
         };
       },
       gameTimer: (playerKey, gameState) => {
+        const { currentTurn, timer } = gameState;
+
         // Selon la clé du joueur on adapte la réponse (player / opponent)
-        const playerTimer =
-          gameState.currentTurn === playerKey ? gameState.timer : 0;
-        const opponentTimer =
-          gameState.currentTurn === playerKey ? 0 : gameState.timer;
-        return { playerTimer: playerTimer, opponentTimer: opponentTimer };
+        const playerTimer = currentTurn === playerKey ? timer : 0;
+        const opponentTimer = currentTurn === playerKey ? 0 : timer;
+        return { playerTimer, opponentTimer };
       },
       gamePawns: (playerKey, gameState) => {
+        const { currentTurn, player1Pawns, player2Pawns } = gameState;
+
         // Selon la clé du joueur on adapte la réponse (player / opponent)
         const playerPawns =
-          gameState.currentTurn === playerKey
-            ? gameState.player2Pawns
-            : gameState.player1Pawns;
+          currentTurn === playerKey ? player2Pawns : player1Pawns;
         const opponentPawns =
-          gameState.currentTurn === playerKey
-            ? gameState.player1Pawns
-            : gameState.player2Pawns;
-        return { playerPawns: playerPawns, opponentPawns: opponentPawns };
+          currentTurn === playerKey ? player1Pawns : player2Pawns;
+        return { playerPawns, opponentPawns };
       },
       gameScore: (playerKey, gameState) => {
+        const { player1Score, player2Score } = gameState;
+
         // Selon la clé du joueur on adapte la réponse (player / opponent)
         const playerScore =
-          playerKey === "player:1"
-            ? gameState.player1Score
-            : gameState.player2Score;
+          playerKey === "player:1" ? player1Score : player2Score;
         const opponentScore =
-          playerKey === "player:1"
-            ? gameState.player2Score
-            : gameState.player1Score;
+          playerKey === "player:1" ? player2Score : player1Score;
         return { playerScore, opponentScore };
       },
       deckViewState: (playerKey, gameState) => {
+        const { currentTurn, deck } = gameState;
+
         const deckViewState = {
-          displayPlayerDeck: gameState.currentTurn === playerKey,
-          displayOpponentDeck: gameState.currentTurn !== playerKey,
-          displayRollButton:
-            gameState.deck.rollsCounter <= gameState.deck.rollsMaximum,
-          rollsCounter: gameState.deck.rollsCounter,
-          rollsMaximum: gameState.deck.rollsMaximum,
-          dices: gameState.deck.dices,
+          displayPlayerDeck: currentTurn === playerKey,
+          displayOpponentDeck: currentTurn !== playerKey,
+          displayRollButton: deck.rollsCounter <= deck.rollsMaximum,
+          rollsCounter: deck.rollsCounter,
+          rollsMaximum: deck.rollsMaximum,
+          dices: deck.dices,
         };
         return deckViewState;
       },
       choicesViewState: (playerKey, gameState) => {
+        const { currentTurn, choices } = gameState;
+
         const choicesViewState = {
           displayChoices: true,
-          canMakeChoice: playerKey === gameState.currentTurn,
-          idSelectedChoice: gameState.choices.idSelectedChoice,
-          availableChoices: gameState.choices.availableChoices,
+          canMakeChoice: playerKey === currentTurn,
+          idSelectedChoice: choices.idSelectedChoice,
+          availableChoices: choices.availableChoices,
         };
         return choicesViewState;
       },
       gridViewState: (playerKey, gameState) => {
+        const { currentTurn, choices, grid } = gameState;
+
         return {
           displayGrid: true,
           canSelectCells:
-            playerKey === gameState.currentTurn &&
-            gameState.choices.availableChoices.length > 0,
-          grid: gameState.grid,
+            playerKey === currentTurn && choices.availableChoices.length > 0,
+          grid,
         };
       },
       // Créer le résumé de la partie
-      gameSummary: (gameState) => {
-        const getLoser = (winner) => {
-          if (winner === null) return null;
-          return winner === "player:1" ? "player:2" : "player:1";
-        };
+      gameSummary: (playerKey, gameState) => {
+        const { winner, player1Score, player2Score } = gameState;
 
-        const gameSummary = {
-          winner: gameState.winner,
-          loser: getLoser(gameState.winner),
-          scores: {
-            player1Score: gameState.player1Score,
-            player2Score: gameState.player2Score,
-          },
-        };
+        const isWinner = playerKey === winner;
+        const isDraw = winner === null;
+        const isLoser = !isWinner && !isDraw;
 
-        return gameSummary;
+        const playerScore =
+          playerKey === "player:1" ? player1Score : player2Score;
+        const opponentScore =
+          playerKey === "player:1" ? player2Score : player1Score;
+
+        return { isWinner, isLoser, isDraw, playerScore, opponentScore };
       },
     },
   },

@@ -1,9 +1,7 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
-import { SocketContext } from "../contexts/socket.context";
 
 const GameSummaryScreen = ({ route, navigation }) => {
-  const socket = useContext(SocketContext);
   const [gameSummary, setGameSummary] = useState(null);
 
   useEffect(() => {
@@ -11,18 +9,24 @@ const GameSummaryScreen = ({ route, navigation }) => {
     console.log(gameSummary);
   }, []);
 
+  // Pour info gameSummary = { isWinner, isLoser, isDraw, playerScore, opponentScore }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Résumé de la partie</Text>
       {gameSummary ? (
         <>
-          <Text style={styles.text}>Vainqueur: {gameSummary.winner}</Text>
-          <Text style={styles.text}>Perdant: {gameSummary.loser}</Text>
+          {gameSummary.isWinner && (
+            <Text style={styles.text}>Vous avez gagné !</Text>
+          )}
+          {gameSummary.isLoser && (
+            <Text style={styles.text}>Vous avez perdu...</Text>
+          )}
+          {gameSummary.isDraw && <Text style={styles.text}>Match nul !</Text>}
           <Text style={styles.text}>
-            Score du joueur 1:{gameSummary.scores.player1Score}
+            Votre score : {gameSummary.playerScore}
           </Text>
           <Text style={styles.text}>
-            Score du joueur 2: {gameSummary.scores.player2Score}
+            Score de l'adversaire : {gameSummary.opponentScore}
           </Text>
           <Button
             title="Revenir au menu"

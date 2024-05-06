@@ -91,8 +91,8 @@ function updateClientsViewEnd(game) {
   emitToPlayers(
     game,
     "game.end",
-    GameService.send.forPlayer.gameSummary(game.gameState),
-    GameService.send.forPlayer.gameSummary(game.gameState)
+    GameService.send.forPlayer.gameSummary("player:1", game.gameState),
+    GameService.send.forPlayer.gameSummary("player:2", game.gameState)
   );
 }
 
