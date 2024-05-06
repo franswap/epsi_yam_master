@@ -91,8 +91,8 @@ function updateClientsViewEnd(game) {
   emitToPlayers(
     game,
     "game.end",
-    GameService.send.forPlayer.gameSummary(game.gameState),
-    GameService.send.forPlayer.gameSummary(game.gameState)
+    GameService.send.forPlayer.gameSummary("player:1", game.gameState),
+    GameService.send.forPlayer.gameSummary("player:2", game.gameState)
   );
 }
 
@@ -120,10 +120,11 @@ const updateGameInterval = (game) => {
     // Update clients view decks, choices and grid
     updateClientsViewDecks(game);
     updateClientsViewChoices(game);
-    updateClientsViewGrid(game);
   }
   // Update clients view timers
   updateClientsViewTimers(game);
+  updateClientsViewGrid(game);
+  updateClientsViewPawns(game);
 };
 
 const handlePlayersDisconnects = (game, gameInterval) => {
@@ -154,6 +155,7 @@ const createGame = (player1Socket, player2Socket) => {
   updateClientsViewTimers(newGame);
   updateClientsViewDecks(newGame);
   updateClientsViewGrid(newGame);
+  updateClientsViewScore(newGame);
 
   // Timer every second
   const gameInterval = setInterval(() => updateGameInterval(newGame), 1000);
@@ -287,7 +289,7 @@ io.on("connection", (socket) => {
     const game = games[gameIndex];
 
     // La sélection d'une cellule signifie la fin du tour (ou plus tard le check des conditions de victoires)
-    // On reset l'état des cases qui étaient précédemment clicables.
+    // On reset l'état des cases qui étaient précédemment cliquables.
     game.gameState.grid = GameService.grid.resetcanBeCheckedCells(
       game.gameState.grid
     );
@@ -299,8 +301,8 @@ io.on("connection", (socket) => {
       game.gameState.grid
     );
 
-    // Calcul du score
-    const { playerCurrentTurnScore, winner } = GameService.utils.calculateScore(
+    // Calcul du score d'un joueur et du gagnant
+    const { score, winner } = GameService.utils.calculateScore(
       game.gameState.currentTurn,
       game.gameState.grid
     );
@@ -308,18 +310,21 @@ io.on("connection", (socket) => {
     // Décrementation des pionts lorsqu'un joueur en place un + Mise à jour du score
     if (game.gameState.currentTurn === "player:1") {
       game.gameState.player1Pawns--;
-      game.gameState.player1Score = playerCurrentTurnScore;
+      game.gameState.player1Score = score;
     } else if (game.gameState.currentTurn === "player:2") {
       game.gameState.player2Pawns--;
-      game.gameState.player2Score = playerCurrentTurnScore;
+      game.gameState.player2Score = score;
     }
 
-    // Puis check si la partie s'arrête (lines / diagolales / no-more-gametokens)
-    const hasNoMoreTokens =
+    // Puis check si la partie s'arrête (plus de pions ou gagnant trouvé avec calculateScore)
+    const hasNoMorePawns =
       game.gameState.player1Pawns === 0 || game.gameState.player2Pawns === 0; // Plus de pions
 
-    if (hasNoMoreTokens || winner) {
-      if (game.gameState.player1Score > game.gameState.player2Score) {
+    // Mise à jour du gagnant
+    if (hasNoMorePawns || winner) {
+      if (winner) {
+        game.gameState.winner = winner;
+      } else if (game.gameState.player1Score > game.gameState.player2Score) {
         game.gameState.winner = "player:1";
       } else if (game.gameState.player1Score < game.gameState.player2Score) {
         game.gameState.winner = "player:2";
@@ -327,9 +332,10 @@ io.on("connection", (socket) => {
         game.gameState.winner = null;
       }
     }
+    console.log(game.gameState);
 
-    // Si la partie est terminée, on envoie l'événement game.winner aux joueurs
-    if (game.gameState.winner || hasNoMoreTokens) {
+    // Si la partie est terminée, on met à jour la vue de fin
+    if (game.gameState.winner || hasNoMorePawns) {
       updateClientsViewEnd(game);
     }
 
@@ -347,7 +353,6 @@ io.on("connection", (socket) => {
     updateClientsViewDecks(game);
     updateClientsViewChoices(game);
     updateClientsViewGrid(game);
-    updateClientsViewTimers(game);
   });
 
   socket.on("disconnect", (reason) => {

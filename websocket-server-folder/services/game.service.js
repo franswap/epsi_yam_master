@@ -175,79 +175,81 @@ const GameService = {
         };
       },
       gameTimer: (playerKey, gameState) => {
+        const { currentTurn, timer } = gameState;
+
         // Selon la clé du joueur on adapte la réponse (player / opponent)
-        const playerTimer =
-          gameState.currentTurn === playerKey ? gameState.timer : 0;
-        const opponentTimer =
-          gameState.currentTurn === playerKey ? 0 : gameState.timer;
-        return { playerTimer: playerTimer, opponentTimer: opponentTimer };
+        const playerTimer = currentTurn === playerKey ? timer : 0;
+        const opponentTimer = currentTurn === playerKey ? 0 : timer;
+        return { playerTimer, opponentTimer };
       },
       gamePawns: (playerKey, gameState) => {
+        const { currentTurn, player1Pawns, player2Pawns } = gameState;
+
         // Selon la clé du joueur on adapte la réponse (player / opponent)
         const playerPawns =
-          gameState.currentTurn === playerKey
-            ? gameState.player2Pawns
-            : gameState.player1Pawns;
+          currentTurn === playerKey ? player2Pawns : player1Pawns;
         const opponentPawns =
-          gameState.currentTurn === playerKey
-            ? gameState.player1Pawns
-            : gameState.player2Pawns;
-        return { playerPawns: playerPawns, opponentPawns: opponentPawns };
+          currentTurn === playerKey ? player1Pawns : player2Pawns;
+        return { playerPawns, opponentPawns };
       },
       gameScore: (playerKey, gameState) => {
+        const { player1Score, player2Score } = gameState;
+
         // Selon la clé du joueur on adapte la réponse (player / opponent)
         const playerScore =
-          playerKey === "player:1"
-            ? gameState.player1Score
-            : gameState.player2Score;
+          playerKey === "player:1" ? player1Score : player2Score;
         const opponentScore =
-          playerKey === "player:1"
-            ? gameState.player2Score
-            : gameState.player1Score;
+          playerKey === "player:1" ? player2Score : player1Score;
         return { playerScore, opponentScore };
       },
       deckViewState: (playerKey, gameState) => {
+        const { currentTurn, deck } = gameState;
+
         const deckViewState = {
-          displayPlayerDeck: gameState.currentTurn === playerKey,
-          displayOpponentDeck: gameState.currentTurn !== playerKey,
-          displayRollButton:
-            gameState.deck.rollsCounter <= gameState.deck.rollsMaximum,
-          rollsCounter: gameState.deck.rollsCounter,
-          rollsMaximum: gameState.deck.rollsMaximum,
-          dices: gameState.deck.dices,
+          displayPlayerDeck: currentTurn === playerKey,
+          displayOpponentDeck: currentTurn !== playerKey,
+          displayRollButton: deck.rollsCounter <= deck.rollsMaximum,
+          rollsCounter: deck.rollsCounter,
+          rollsMaximum: deck.rollsMaximum,
+          dices: deck.dices,
         };
         return deckViewState;
       },
       choicesViewState: (playerKey, gameState) => {
+        const { currentTurn, choices } = gameState;
+
         const choicesViewState = {
           displayChoices: true,
-          canMakeChoice: playerKey === gameState.currentTurn,
-          idSelectedChoice: gameState.choices.idSelectedChoice,
-          availableChoices: gameState.choices.availableChoices,
+          canMakeChoice: playerKey === currentTurn,
+          idSelectedChoice: choices.idSelectedChoice,
+          availableChoices: choices.availableChoices,
         };
         return choicesViewState;
       },
       gridViewState: (playerKey, gameState) => {
+        const { currentTurn, choices, grid } = gameState;
+
         return {
           displayGrid: true,
           canSelectCells:
-            playerKey === gameState.currentTurn &&
-            gameState.choices.availableChoices.length > 0,
-          grid: gameState.grid,
+            playerKey === currentTurn && choices.availableChoices.length > 0,
+          grid,
         };
       },
-      gameSummary: (gameState) => {
-        // Créer le résumé de la partie
-        const gameSummary = {
-          winner: gameState.winner,
-          loser: gameState.winner === "player:1" ? "player:2" : "player:1",
-          scores: {
-            player1Score: gameState.player1Score,
-            player2Score: gameState.player2Score,
-          },
-        };
+      // Créer le résumé de la partie
+      gameSummary: (playerKey, gameState) => {
+        const { winner, player1Score, player2Score } = gameState;
 
-        return gameSummary;
+        const isWinner = playerKey === winner;
+        const isDraw = winner === null;
+        const isLoser = !isWinner && !isDraw;
+
+        const playerScore =
+          playerKey === "player:1" ? player1Score : player2Score;
+        const opponentScore =
+          playerKey === "player:1" ? player2Score : player1Score;
+
+        return { isWinner, isLoser, isDraw, playerScore, opponentScore };
       },
     },
   },
@@ -421,7 +423,7 @@ const GameService = {
         return [nbAlign, nbMaxAlign];
       }
 
-      function addScore(nbMaxAlign) {
+      function calculatePoint(nbMaxAlign) {
         let score = 0;
         if (nbMaxAlign === 3) score = 1;
         else if (nbMaxAlign === 4) score = 2;
@@ -429,44 +431,34 @@ const GameService = {
         return score;
       }
 
-      function addScoreLineRow() {
+      function calculateScoreRowOrColumn(direction) {
         let score = 0;
-        for (let i = 0; i < grid.length; i++) {
-          let nbRowAlign = 0;
-          let nbMaxRowAlign = 0;
-          let nbColumn = 0;
-          let nbMaxColumnAlign = 0;
+        let nbRows = grid.length;
+        let nbCols = grid[0].length;
 
-          for (let j = 0; j < grid[i].length; j++) {
-            // Calculer le score par ligne
-            [nbRowAlign, nbMaxRowAlign] = calculateAlignment(
-              grid,
-              i,
-              j,
-              playerKey,
-              nbRowAlign,
-              nbMaxRowAlign
-            );
+        for (let i = 0; i < (direction === "row" ? nbRows : nbCols); i++) {
+          let nbAlign = 0;
+          let nbMaxAlign = 0;
 
-            // Calculer le score par colonne
-            [nbColumn, nbMaxColumnAlign] = calculateAlignment(
+          for (let j = 0; j < (direction === "row" ? nbCols : nbRows); j++) {
+            let rowIndex = direction === "row" ? i : j;
+            let columnIndex = direction === "row" ? j : i;
+            [nbAlign, nbMaxAlign] = calculateAlignment(
               grid,
-              j,
-              i,
+              rowIndex,
+              columnIndex,
               playerKey,
-              nbColumn,
-              nbMaxColumnAlign
+              nbAlign,
+              nbMaxAlign
             );
           }
 
-          // Calculer le score par ligne et colonne
-          score += addScore(nbMaxRowAlign);
-          score += addScore(nbMaxColumnAlign);
+          score += calculatePoint(nbMaxAlign);
         }
         return score;
       }
 
-      function addScoreDiagonals() {
+      function calculateScoreDiagonals() {
         let score = 0;
         let rows = grid.length;
         let cols = grid[0].length;
@@ -503,15 +495,16 @@ const GameService = {
           }
 
           // Ajout du score pour les diagonales et anti-diagonales
-          score += addScore(nbMaxDiagonalAlign);
-          score += addScore(nbMaxAntiDiagonalAlign);
+          score += calculatePoint(nbMaxDiagonalAlign);
+          score += calculatePoint(nbMaxAntiDiagonalAlign);
         }
         return score;
       }
 
       let winner = null;
-      let score = addScoreLineRow();
-      score += addScoreDiagonals();
+      let score = calculateScoreRowOrColumn("row");
+      score += calculateScoreRowOrColumn("column");
+      score += calculateScoreDiagonals();
 
       return { score, winner };
     },

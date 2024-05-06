@@ -1,4 +1,4 @@
-import gameService from "../services/game.service.js";
+import GameService from "../services/game.service.js";
 
 const grid = [
   [
@@ -53,58 +53,6 @@ const grid = [
   ],
 ];
 
-// describe("gameService", () => {
-//   describe("calculateScore", () => {
-//     it("should correctly calculate the score", () => {
-//       // const input = // insérez ici les données d'entrée appropriées
-//       // const expectedOutput = // insérez ici le résultat attendu
-
-//       const result = gameService.utils.calculateScore("player:1", grid);
-
-//       expect(result).toEqual(5);
-//     });
-//   });
-// });
-
-const result = gameService.utils.calculateScore("player:1", grid);
-console.log(result);
-
-// Supposons que 'matrix' est votre matrice carrée
-let matrix = [
-  [1, 2, 3, 4],
-  [5, 6, 7, 8],
-  [9, 10, 11, 12],
-  [13, 14, 15, 16],
-];
-
-let diagonals = [];
-
-for (let i = 0; i < matrix.length; i++) {
-  let j = 0,
-    k = i;
-  let diagonal = [];
-  while (k >= 0) {
-    diagonal.push(matrix[k][j]);
-    k--;
-    j++;
-  }
-  diagonals.push(diagonal);
-}
-
-for (let j = 1; j < matrix[0].length; j++) {
-  let i = matrix.length - 1,
-    k = j;
-  let diagonal = [];
-  while (k < matrix[0].length) {
-    diagonal.push(matrix[i][k]);
-    i--;
-    k++;
-  }
-  diagonals.push(diagonal);
-}
-
-console.log(diagonals);
-
 const displayGrid = (grid) => {
   let output = "";
   for (let row of grid) {
@@ -124,5 +72,57 @@ const displayGrid = (grid) => {
   console.log(output);
 };
 
-// Utilisation de la fonction
+// Affichage du tableau
 displayGrid(grid);
+
+// Test de la fonction calculateScore
+describe("GameService", () => {
+  describe("calculateScore", () => {
+    it("should correctly calculate the score", () => {
+      const scorePlayer1 = GameService.utils.calculateScore("player:1", grid);
+      const scorePlayer2 = GameService.utils.calculateScore("player:2", grid);
+      expect(scorePlayer1.score).toEqual(9);
+      expect(scorePlayer2.score).toEqual(0);
+      expect(scorePlayer1.winner).toEqual(null);
+    });
+
+    it("should return 0 when no cells are owned by the player", () => {
+      const grid = [
+        [{ owner: null }, { owner: null }, { owner: null }, { owner: null }],
+        [{ owner: null }, { owner: null }, { owner: null }, { owner: null }],
+      ];
+      const scorePlayer1 = GameService.utils.calculateScore("player:1", grid);
+      expect(scorePlayer1.score).toEqual(0);
+    });
+
+    it("should return 0 when the player is not specified", () => {
+      const grid = [
+        [{ owner: "player:1" }, { owner: "player:2" }, { owner: "player:1" }],
+        [{ owner: "player:1" }, { owner: "player:1" }, { owner: "player:1" }],
+      ];
+      const scoreNoPlayer = GameService.utils.calculateScore(null, grid);
+      expect(scoreNoPlayer.score).toEqual(0);
+    });
+
+    it("should return the winner when lining up 5 pawns", () => {
+      const grid = [
+        [
+          { owner: "player:1" },
+          { owner: "player:2" },
+          { owner: "player:1" },
+          { owner: "player:2" },
+          { owner: "player:1" },
+        ],
+        [
+          { owner: "player:1" },
+          { owner: "player:1" },
+          { owner: "player:1" },
+          { owner: "player:1" },
+          { owner: "player:1" },
+        ],
+      ];
+      const scorePlayer1 = GameService.utils.calculateScore("player:1", grid);
+      expect(scorePlayer1.winner).toEqual("player:1");
+    });
+  });
+});
