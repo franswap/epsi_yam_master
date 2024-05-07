@@ -1,5 +1,5 @@
-import { useContext, useEffect } from "react";
-import { StyleSheet, View, Button, Text } from "react-native";
+import { useContext } from "react";
+import { StyleSheet, View, Text } from "react-native";
 import { SocketContext } from "../contexts/socket.context";
 import OnlineGameController from "../controllers/online-game.controller";
 
@@ -25,8 +25,8 @@ export default function OnlineGameScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#272744",
   },
 });

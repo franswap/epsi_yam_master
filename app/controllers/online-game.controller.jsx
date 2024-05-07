@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { SocketContext } from "../contexts/socket.context";
 import Board from "../components/board/board.component";
 
@@ -57,6 +57,9 @@ export default function OnlineGameController({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <View>
+        <Text style={styles.title}>YAM MASTER</Text>
+      </View>
       {!inQueue && !inGame && (
         <>
           <Text style={styles.paragraph}>Waiting for server datas...</Text>
@@ -66,7 +69,9 @@ export default function OnlineGameController({ navigation }) {
       {inQueue && (
         <>
           <Text style={styles.paragraph}>Waiting for another player...</Text>
-          <Button title="Revenir au menu" onPress={leaveQueue} />
+          <TouchableOpacity style={styles.button} onPress={leaveQueue}>
+            <Text style={styles.buttonText}>Revenir au menu</Text>
+          </TouchableOpacity>
         </>
       )}
 
@@ -78,13 +83,31 @@ export default function OnlineGameController({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
     height: "100%",
+    backgroundColor: "#272744",
   },
   paragraph: {
-    fontSize: 16,
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#8B6D9C",
+  },
+  button: {
+    backgroundColor: "#F2D3AB",
+    borderRadius: 25,
+    color: "#494D7E",
+    height: 60,
+    width: 250,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    fontSize: "24px",
+    fontWeight: "bold",
+    letterSpacing: "0%",
+    color: "#494D7E",
   },
 });
