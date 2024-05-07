@@ -1,5 +1,5 @@
-import { useContext, useEffect } from "react";
-import { StyleSheet, View, Button, Text } from "react-native";
+import { useContext } from "react";
+import { StyleSheet, View, Text } from "react-native";
 import { SocketContext } from "../contexts/socket.context";
 import OnlineGameController from "../controllers/online-game.controller";
 
