@@ -1,3 +1,5 @@
+import "@expo/metro-runtime";
+
 import React from "react";
 import "@expo/metro-runtime";
 import { LogBox } from "react-native";
