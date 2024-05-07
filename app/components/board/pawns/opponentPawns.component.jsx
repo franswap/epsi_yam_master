@@ -3,35 +3,35 @@ import { View, Text, StyleSheet } from "react-native";
 import { SocketContext } from "../../../contexts/socket.context";
 import { colors } from "../../../constants/colors";
 
-const PlayerScore = () => {
+const OpponentPawns = () => {
   const socket = useContext(SocketContext);
-  const [playerScore, setPlayerScore] = useState(0);
+  const [opponentPawns, setOpponentPawns] = useState(0);
 
   useEffect(() => {
-    socket.on("score.update", (data) => {
-      setPlayerScore(data["playerScore"]);
+    socket.on("game.pawns", (data) => {
+      setOpponentPawns(data["opponentPawns"]);
     });
   }, []);
 
   return (
-    <View style={styles.playerScoreContainer}>
-      <Text style={styles.playerScoreText}>Score: {playerScore}</Text>
+    <View style={styles.playerPawnsContainer}>
+      <Text style={styles.opponentPawnsText}>Pawns: {opponentPawns}</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  playerScoreContainer: {
+  playerPawnsContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: colors.indigo,
   },
-  playerScoreText: {
+  opponentPawnsText: {
     color: colors.white,
     fontSize: 14,
     fontWeight: "bold",
   },
 });
 
-export default PlayerScore;
+export default OpponentPawns;

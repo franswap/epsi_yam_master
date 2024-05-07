@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { SocketContext } from "../contexts/socket.context";
 import Board from "../components/board/board.component";
+import Header from "../components/header";
+import Button from "../components/button";
 
 export default function OnlineGameController({ navigation }) {
   const socket = useContext(SocketContext);
@@ -57,22 +59,23 @@ export default function OnlineGameController({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View>
-        <Text style={styles.title}>YAM MASTER</Text>
-      </View>
       {!inQueue && !inGame && (
         <>
-          <Text style={styles.paragraph}>Waiting for server datas...</Text>
+          <Header />
+          <Text style={[styles.paragraph, styles.spaccing]}>
+            Waiting for server datas...
+          </Text>
         </>
       )}
 
       {inQueue && (
-        <>
-          <Text style={styles.paragraph}>Waiting for another player...</Text>
-          <TouchableOpacity style={styles.button} onPress={leaveQueue}>
-            <Text style={styles.buttonText}>Revenir au menu</Text>
-          </TouchableOpacity>
-        </>
+        <View>
+          <Header />
+          <Text style={[styles.paragraph, styles.spaccing]}>
+            En attente dun autre joueur...
+          </Text>
+          <Button onPress={leaveQueue} text="Quitter la file" iconName="home" />
+        </View>
       )}
 
       {inGame && <Board />}
@@ -109,5 +112,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: "0%",
     color: "#494D7E",
+  },
+  spaccing: {
+    paddingTop: 30,
+    paddingBottom: 30,
   },
 });

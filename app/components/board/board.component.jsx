@@ -9,11 +9,12 @@ import Grid from "./grid/grid.component";
 import PlayerPawns from "./pawns/pawns.component";
 import PlayerScore from "./scores/playerScore.component";
 import OpponentScore from "./scores/opponentScore.component";
+import OpponentPawns from "./pawns/opponentPawns.component";
 
 const OpponentInfos = () => {
   return (
     <View style={styles.opponentInfosContainer}>
-      <Text>Opponent infos</Text>
+      <Text style={styles.opponentInfosText}>Adversaire</Text>
     </View>
   );
 };
@@ -21,7 +22,7 @@ const OpponentInfos = () => {
 const PlayerInfos = () => {
   return (
     <View style={styles.playerInfosContainer}>
-      <Text>Player Infos</Text>
+      <Text style={styles.playerInfosText}>Player Infos</Text>
     </View>
   );
 };
@@ -29,32 +30,40 @@ const PlayerInfos = () => {
 const Board = () => {
   return (
     <View style={styles.container}>
-      <View style={[styles.row, { height: "5%" }]}>
-        <OpponentInfos />
+      <View style={[styles.rowOpponentCard, { height: "6%" }]}>
+        <View>
+          <OpponentInfos />
+        </View>
         <View style={styles.opponentTimerScoreContainer}>
-          <OpponentTimer />
           <OpponentScore />
+          <OpponentTimer />
+          <OpponentPawns />
         </View>
       </View>
 
-      <View style={[styles.row, { height: "25%" }]}>
+      <View style={[styles.row, { height: "20%" }]}>
         <OpponentDeck />
       </View>
 
-      <View style={[styles.row, { height: "40%" }]}>
+      <View style={[styles.row, { height: "35%" }]}>
         <Grid />
+      </View>
+
+      <View style={[styles.row, { height: "8%" }]}>
         <Choices />
       </View>
 
-      <View style={[styles.row, { height: "25%" }]}>
+      <View style={[styles.row, { height: "20%" }]}>
         <PlayerDeck />
       </View>
 
-      <View style={[styles.row, { height: "5%" }]}>
-        <PlayerInfos />
-        <View style={styles.playerTimerScoreContainer}>
-          <PlayerTimer />
+      <View style={[styles.rowOpponentCard, { height: "6%" }]}>
+        <View>
+          <PlayerInfos />
+        </View>
+        <View style={styles.opponentTimerScoreContainer}>
           <PlayerScore />
+          <PlayerTimer />
           <PlayerPawns />
         </View>
       </View>
@@ -75,23 +84,30 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     width: "100%",
-    borderBottomWidth: 1,
     color: "white",
-    backgroundColor: "#8b6d9c",
-    borderRadius: 25,
+    borderRadius: 10,
+  },
+  rowOpponentCard: {
+    flexDirection: "column",
+    width: "100%",
+    color: "white",
+    borderRadius: 10,
   },
   opponentInfosContainer: {
     flex: 7,
     justifyContent: "center",
     alignItems: "center",
     borderRightWidth: 1,
-    borderColor: "black",
-    color: "white",
     backgroundColor: "#494d7e",
+  },
+  opponentInfosText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   opponentTimerScoreContainer: {
     flex: 3,
-    flexDirection: "column",
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     color: "white",
@@ -136,8 +152,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderBottomWidth: 1,
-    color: "white",
     backgroundColor: "#494d7e",
   },
   playerInfosContainer: {
@@ -147,6 +161,11 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     color: "white",
     backgroundColor: "#494d7e",
+  },
+  playerInfosText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   playerTimerScoreContainer: {
     flex: 3,

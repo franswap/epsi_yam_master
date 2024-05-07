@@ -1,6 +1,13 @@
 import { useState, useEffect, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { SocketContext } from "../../../contexts/socket.context";
+import { colors } from "../../../constants/colors";
 
 const Choices = () => {
   const socket = useContext(SocketContext);
@@ -28,21 +35,34 @@ const Choices = () => {
 
   return (
     <View style={styles.choicesContainer}>
-      {displayChoices &&
-        availableChoices.map((choice) => (
-          <TouchableOpacity
-            key={choice.id}
-            style={[
-              styles.choiceButton,
-              idSelectedChoice === choice.id && styles.selectedChoice,
-              !canMakeChoice && styles.disabledChoice,
-            ]}
-            onPress={() => handleSelectChoice(choice.id)}
-            disabled={!canMakeChoice}
-          >
-            <Text style={styles.choiceText}>{choice.value}</Text>
-          </TouchableOpacity>
-        ))}
+      <Text style={styles.choiceTitle}>Choix:</Text>
+      {availableChoices.length === 0 ? (
+        <View style={styles.noChoicesContainer}>
+          <Text style={styles.noChoicesText}>Pas de choix disponibles</Text>
+        </View>
+      ) : (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.choicesScrollView}
+        >
+          {displayChoices &&
+            availableChoices.map((choice) => (
+              <TouchableOpacity
+                key={choice.id}
+                style={[
+                  styles.choiceButton,
+                  idSelectedChoice === choice.id && styles.selectedChoice,
+                  !canMakeChoice && styles.disabledChoice,
+                ]}
+                onPress={() => handleSelectChoice(choice.id)}
+                disabled={!canMakeChoice}
+              >
+                <Text style={styles.choiceText}>{choice.value}</Text>
+              </TouchableOpacity>
+            ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -51,28 +71,52 @@ const styles = StyleSheet.create({
   choicesContainer: {
     flex: 1,
     flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderColor: "black",
-    backgroundColor: "lightgrey",
+    alignItems: "center",
+    margin: 5,
+    borderRadius: 25,
+    borderColor: "#494d7e",
+    backgroundColor: "#494d7e",
+  },
+  choicesText: {
+    marginLeft: 10,
+  },
+  noChoicesContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    marginLeft: 10,
+  },
+  choicesScrollView: {
+    flex: 1,
   },
   choiceButton: {
-    backgroundColor: "white",
+    backgroundColor: "#f2d3ab",
     borderRadius: 5,
-    marginVertical: 5,
+    margin: 5,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    width: "100%",
-    height: "10%",
+    width: "90px",
+    height: "35px",
   },
   selectedChoice: {
-    backgroundColor: "lightgreen",
+    backgroundColor: "#c69fa5",
+  },
+  choiceTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: colors.white,
+    marginLeft: 15,
   },
   choiceText: {
     fontSize: 13,
     fontWeight: "bold",
+    color: "#494d7e",
+  },
+  noChoicesText: {
+    fontSize: 13,
+    fontWeight: "bold",
+    color: colors.white,
   },
   disabledChoice: {
     opacity: 0.5,

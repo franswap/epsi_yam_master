@@ -1,26 +1,24 @@
-import { StyleSheet, View, Button, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View } from "react-native";
+import Header from "../components/header";
+import Button from "../components/button";
 
 export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <View>
-        <Text style={styles.title}>YAM MASTER</Text>
-      </View>
+      <Header />
       <View style={styles.bloc}>
-        <TouchableOpacity
-          style={styles.button}
+        <Button
           onPress={() => navigation.navigate("OnlineGameScreen")}
-        >
-          <Text style={styles.buttonText}>Jouer en ligne</Text>
-        </TouchableOpacity>
+          text="Jouer en ligne"
+          iconName="play"
+        />
       </View>
       <View style={styles.bloc}>
-        <TouchableOpacity
-          style={styles.button}
+        <Button
           onPress={() => navigation.navigate("VsBotGameScreen")}
-        >
-          <Text style={styles.buttonText}>Jouer contre le bot</Text>
-        </TouchableOpacity>
+          text="Versus bot"
+          iconNameMaterial="robot-angry"
+        />
       </View>
     </View>
   );
@@ -32,27 +30,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#272744",
-  },
-  title: {
-    fontSize: 36,
-    color: "#8B6D9C",
-    fontWeight: "bold",
-  },
-  button: {
-    backgroundColor: "#F2D3AB",
-    borderRadius: 25,
-    color: "#494D7E",
-    height: 60,
-    width: 250,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    letterSpacing: "0%",
-    color: "#494D7E",
   },
   bloc: {
     margin: 40,
