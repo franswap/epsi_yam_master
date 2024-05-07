@@ -104,7 +104,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "black",
   },
   rollButtonText: {
     fontSize: 18,

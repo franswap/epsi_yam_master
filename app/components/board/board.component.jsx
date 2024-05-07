@@ -26,7 +26,7 @@ const PlayerInfos = () => {
   );
 };
 
-const Board = ({ gameViewState }) => {
+const Board = () => {
   return (
     <View style={styles.container}>
       <View style={[styles.row, { height: "5%" }]}>
