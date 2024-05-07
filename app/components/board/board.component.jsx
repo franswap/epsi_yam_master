@@ -9,11 +9,12 @@ import Grid from "./grid/grid.component";
 import PlayerPawns from "./pawns/pawns.component";
 import PlayerScore from "./scores/playerScore.component";
 import OpponentScore from "./scores/opponentScore.component";
+import OpponentPawns from "./pawns/opponentPawns.component";
 
 const OpponentInfos = () => {
   return (
     <View style={styles.opponentInfosContainer}>
-      <Text>Opponent infos</Text>
+      <Text style={styles.opponentInfosText}>Adversaire</Text>
     </View>
   );
 };
@@ -21,7 +22,7 @@ const OpponentInfos = () => {
 const PlayerInfos = () => {
   return (
     <View style={styles.playerInfosContainer}>
-      <Text>Player Infos</Text>
+      <Text style={styles.playerInfosText}>Player Infos</Text>
     </View>
   );
 };
@@ -29,32 +30,40 @@ const PlayerInfos = () => {
 const Board = () => {
   return (
     <View style={styles.container}>
-      <View style={[styles.row, { height: "5%" }]}>
-        <OpponentInfos />
+      <View style={[styles.rowOpponentCard, { height: "6%" }]}>
+        <View>
+          <OpponentInfos />
+        </View>
         <View style={styles.opponentTimerScoreContainer}>
-          <OpponentTimer />
           <OpponentScore />
+          <OpponentTimer />
+          <OpponentPawns />
         </View>
       </View>
 
-      <View style={[styles.row, { height: "25%" }]}>
+      <View style={[styles.row, { height: "20%" }]}>
         <OpponentDeck />
       </View>
 
-      <View style={[styles.row, { height: "40%" }]}>
+      <View style={[styles.row, { height: "35%" }]}>
         <Grid />
+      </View>
+
+      <View style={[styles.row, { height: "8%" }]}>
         <Choices />
       </View>
 
-      <View style={[styles.row, { height: "25%" }]}>
+      <View style={[styles.row, { height: "20%" }]}>
         <PlayerDeck />
       </View>
 
-      <View style={[styles.row, { height: "5%" }]}>
-        <PlayerInfos />
-        <View style={styles.playerTimerScoreContainer}>
-          <PlayerTimer />
+      <View style={[styles.rowOpponentCard, { height: "6%" }]}>
+        <View>
+          <PlayerInfos />
+        </View>
+        <View style={styles.opponentTimerScoreContainer}>
           <PlayerScore />
+          <PlayerTimer />
           <PlayerPawns />
         </View>
       </View>
@@ -70,44 +79,60 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     height: "100%",
+    backgroundColor: "#272744",
   },
   row: {
     flexDirection: "row",
     width: "100%",
-    borderBottomWidth: 1,
-    borderColor: "black",
+    color: "white",
+    borderRadius: 10,
+  },
+  rowOpponentCard: {
+    flexDirection: "column",
+    width: "100%",
+    color: "white",
+    borderRadius: 10,
   },
   opponentInfosContainer: {
     flex: 7,
     justifyContent: "center",
     alignItems: "center",
     borderRightWidth: 1,
-    borderColor: "black",
-    backgroundColor: "lightgrey",
+    backgroundColor: "#494d7e",
+  },
+  opponentInfosText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   opponentTimerScoreContainer: {
     flex: 3,
-    flexDirection: "column",
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "lightgrey",
+    color: "white",
+    backgroundColor: "#494d7e",
   },
   opponentTimerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    color: "white",
+    backgroundColor: "#494d7e",
   },
   opponentScoreContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    color: "white",
+    backgroundColor: "#494d7e",
   },
   deckOpponentContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderColor: "black",
+    backgroundColor: "white",
   },
   gridContainer: {
     flex: 7,
@@ -120,41 +145,49 @@ const styles = StyleSheet.create({
     flex: 3,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "lightgrey",
+    color: "#f2d3ab",
+    backgroundColor: "#494d7e",
   },
   deckPlayerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderBottomWidth: 1,
-    borderColor: "black",
+    backgroundColor: "#494d7e",
   },
   playerInfosContainer: {
     flex: 7,
     justifyContent: "center",
     alignItems: "center",
     borderRightWidth: 1,
-    borderColor: "black",
-    backgroundColor: "lightgrey",
+    color: "white",
+    backgroundColor: "#494d7e",
+  },
+  playerInfosText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   playerTimerScoreContainer: {
     flex: 3,
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "lightgrey",
+    color: "white",
+    backgroundColor: "#494d7e",
   },
   playerTimerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "lightgrey",
+    color: "white",
+    backgroundColor: "#494d7e",
   },
   playerScoreContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "lightgrey",
+    color: "white",
+    backgroundColor: "#494d7e",
   },
 });
 

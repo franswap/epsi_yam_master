@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { SocketContext } from "../../../contexts/socket.context";
+import { colors } from "../../../constants/colors";
 
 const PlayerTimer = () => {
   const socket = useContext(SocketContext);
@@ -14,7 +15,7 @@ const PlayerTimer = () => {
 
   return (
     <View style={styles.playerTimerContainer}>
-      <Text>Timer: {playerTimer}</Text>
+      <Text style={styles.playerTimerText}>Timer: {playerTimer}</Text>
     </View>
   );
 };
@@ -24,7 +25,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "lightgrey",
+    color: "white",
+    backgroundColor: "#494d7e",
+  },
+  playerTimerText: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: "bold",
   },
 });
 

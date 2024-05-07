@@ -1,18 +1,23 @@
-import { StyleSheet, View, Button } from "react-native";
+import { StyleSheet, View } from "react-native";
+import Header from "../components/header";
+import Button from "../components/button";
 
 export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <View>
+      <Header />
+      <View style={styles.bloc}>
         <Button
-          title="Jouer en ligne"
           onPress={() => navigation.navigate("OnlineGameScreen")}
+          text="Jouer en ligne"
+          iconName="play"
         />
       </View>
-      <View>
+      <View style={styles.bloc}>
         <Button
-          title="Jouer contre le bot"
           onPress={() => navigation.navigate("VsBotGameScreen")}
+          text="Versus bot"
+          iconNameMaterial="robot-angry"
         />
       </View>
     </View>
@@ -22,8 +27,11 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#272744",
+  },
+  bloc: {
+    margin: 40,
   },
 });
