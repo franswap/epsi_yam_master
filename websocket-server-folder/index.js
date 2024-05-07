@@ -119,34 +119,30 @@ const updateGameInterval = (game) => {
       game.gameState.grid
     );
 
+    // Update clients view decks, choices and grid
+    updateClientsViewDecks(game);
+    updateClientsViewChoices(game);
+    updateClientsViewGrid(game);
+
     // Bot turn
     // Roll dices
     if (game.gameState.hasBot && game.gameState.currentTurn === "player:2") {
       for (let i = 0; i < 3; i++) {
-        (function (i) {
-          setTimeout(() => {
-            console.log("Bot turn roll", i);
-            const dices = GameService.dices.roll(game.gameState.deck.dices);
-            game.gameState.deck.dices = dices;
-            game.gameState.deck.rollsCounter++;
-            updateClientsViewDecks(game);
-            updateClientsViewChoices(game);
-            if (i === 2) {
-              game.gameState.timer = 5;
-            }
-          }, 2000 * (i + 1)); // Définir le délai en fonction de l'itération
-        })(i);
+        setTimeout(() => {
+          const dices = GameService.dices.roll(game.gameState.deck.dices);
+          game.gameState.deck.dices = dices;
+          game.gameState.deck.rollsCounter++;
+          updateClientsViewDecks(game);
+          updateClientsViewChoices(game);
+          if (i === 2) {
+            game.gameState.timer = 5;
+          }
+        }, 2000 * (i + 1));
       }
     }
-
-    // Update clients view decks, choices and grid
-    updateClientsViewDecks(game);
-    updateClientsViewChoices(game);
   }
   // Update clients view timers
   updateClientsViewTimers(game);
-  updateClientsViewGrid(game);
-  updateClientsViewPawns(game);
 };
 
 const handlePlayersDisconnects = (game, gameInterval) => {
@@ -177,7 +173,6 @@ const createGame = (player1Socket, player2Socket) => {
   updateClientsViewTimers(newGame);
   updateClientsViewDecks(newGame);
   updateClientsViewGrid(newGame);
-  updateClientsViewScore(newGame);
 
   // Timer every second
   const gameInterval = setInterval(() => updateGameInterval(newGame), 1000);
@@ -203,7 +198,6 @@ function createBotGame(player1Socket) {
   updateClientsViewTimers(newGame);
   updateClientsViewDecks(newGame);
   updateClientsViewGrid(newGame);
-  updateClientsViewScore(newGame);
 
   // Timer every second
   const gameInterval = setInterval(() => updateGameInterval(newGame), 1000);
@@ -328,8 +322,6 @@ io.on("connection", (socket) => {
       game.gameState.grid
     );
 
-    updateClientsViewPawns(game);
-    updateClientsViewScore(game);
     updateClientsViewChoices(game);
     updateClientsViewGrid(game);
   });
@@ -401,29 +393,29 @@ io.on("connection", (socket) => {
     game.gameState.deck = GameService.init.deck();
     game.gameState.choices = GameService.init.choices();
 
-    // et on remet à jour la vue
-    updateClientsViewDecks(game);
-    updateClientsViewChoices(game);
-    updateClientsViewGrid(game);
-
     // Bot turn
     // Roll dices
     if (game.gameState.hasBot && game.gameState.currentTurn === "player:2") {
       for (let i = 0; i < 3; i++) {
-        (function (i) {
-          setTimeout(() => {
-            const dices = GameService.dices.roll(game.gameState.deck.dices);
-            game.gameState.deck.dices = dices;
-            game.gameState.deck.rollsCounter++;
-            updateClientsViewDecks(game);
-            updateClientsViewChoices(game);
-            if (i === 2) {
-              game.gameState.timer = 5;
-            }
-          }, 2000 * (i + 1)); // Définir le délai en fonction de l'itération
-        })(i);
+        setTimeout(() => {
+          const dices = GameService.dices.roll(game.gameState.deck.dices);
+          game.gameState.deck.dices = dices;
+          game.gameState.deck.rollsCounter++;
+          updateClientsViewDecks(game);
+          updateClientsViewChoices(game);
+          if (i === 2) {
+            game.gameState.timer = 5;
+          }
+        }, 2000 * (i + 1));
       }
     }
+
+    // et on remet à jour les vues
+    updateClientsViewPawns(game);
+    updateClientsViewScore(game);
+    updateClientsViewDecks(game);
+    updateClientsViewChoices(game);
+    updateClientsViewGrid(game);
   });
 
   socket.on("disconnect", (reason) => {
