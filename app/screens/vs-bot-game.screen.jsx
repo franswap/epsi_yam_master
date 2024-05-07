@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { SocketContext } from "../contexts/socket.context";
 import VsBotGameController from "../controllers/vs-bot-game.controller";
