@@ -69,7 +69,7 @@ export default function OnlineGameController({ navigation }) {
       )}
 
       {inQueue && (
-        <View>
+        <View style={styles.container}>
           <Header />
           <Text style={[styles.paragraph, styles.spaccing]}>
             En attente dun autre joueur...

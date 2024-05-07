@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { colors } from "../constants/colors";
+import Button from "../components/button";
 
 const GameSummaryScreen = ({ route, navigation }) => {
   const [gameSummary, setGameSummary] = useState(null);
@@ -29,8 +31,9 @@ const GameSummaryScreen = ({ route, navigation }) => {
             Score de l'adversaire : {gameSummary.opponentScore}
           </Text>
           <Button
-            title="Revenir au menu"
             onPress={() => navigation.navigate("HomeScreen")}
+            text="Revenir au menu"
+            iconName="home"
           />
         </>
       ) : (
@@ -45,16 +48,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: colors.darkBlue,
   },
   title: {
-    fontSize: 24,
+    fontSize: 34,
     fontWeight: "bold",
     marginBottom: 20,
+    color: colors.beige,
   },
   text: {
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 22,
+    marginBottom: 30,
+    fontWeight: "bold",
+    color: colors.mauve,
   },
 });
 
