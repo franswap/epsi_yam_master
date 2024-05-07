@@ -1,6 +1,7 @@
 import { useEffect, useContext, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { SocketContext } from "../../../contexts/socket.context";
+import { colors } from "../../../constants/colors";
 
 const Grid = () => {
   const socket = useContext(SocketContext);
@@ -21,33 +22,41 @@ const Grid = () => {
       setCanSelectCells(data["canSelectCells"]);
       setGrid(data["grid"]);
     });
-  }, []);
+  }, [socket]);
 
   return (
     <View style={styles.gridContainer}>
       {displayGrid &&
         grid.map((row, rowIndex) => (
           <View key={rowIndex} style={styles.row}>
-            {row.map((cell, cellIndex) => (
-              <TouchableOpacity
-                key={cell.id}
-                style={[
-                  styles.cell,
-                  cell.owner === "player:1" && styles.playerOwnedCell,
-                  cell.owner === "player:2" && styles.opponentOwnedCell,
-                  cell.canBeChecked &&
-                    !(cell.owner === "player:1") &&
-                    !(cell.owner === "player:2") &&
-                    styles.canBeCheckedCell,
-                  rowIndex !== 0 && styles.topBorder,
-                  cellIndex !== 0 && styles.leftBorder,
-                ]}
-                onPress={() => handleSelectCell(cell.id, rowIndex, cellIndex)}
-                disabled={!cell.canBeChecked}
-              >
-                <Text style={styles.cellText}>{cell.viewContent}</Text>
-              </TouchableOpacity>
-            ))}
+            {row.map((cell, cellIndex) => {
+              const isSelectable = cell.canBeChecked && !cell.owner;
+
+              return (
+                <TouchableOpacity
+                  key={cell.id}
+                  style={[
+                    styles.cell,
+                    cell.owner === "player:1" && styles.playerOwnedCell,
+                    cell.owner === "player:2" && styles.opponentOwnedCell,
+                    isSelectable && styles.selectableCell,
+                    rowIndex !== 0 && styles.topBorder,
+                    cellIndex !== 0 && styles.leftBorder,
+                  ]}
+                  onPress={() => handleSelectCell(cell.id, rowIndex, cellIndex)}
+                  disabled={!isSelectable}
+                >
+                  <Text
+                    style={[
+                      styles.cellText,
+                      isSelectable && styles.selectableCellText,
+                    ]}
+                  >
+                    {cell.viewContent}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         ))}
     </View>
@@ -67,6 +76,7 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
+    margin: 1,
   },
   cell: {
     flexDirection: "row",
@@ -75,22 +85,31 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "black",
+    borderColor: "#8b6d9c",
+    backgroundColor: "#8b6d9c",
+    borderRadius: 10,
+    margin: 1,
   },
   cellText: {
-    fontSize: 11,
+    fontSize: 20,
+    color: "white",
+    fontWeight: "bold",
   },
   playerOwnedCell: {
-    backgroundColor: "lightgreen",
+    backgroundColor: colors.beige,
     opacity: 0.9,
   },
   opponentOwnedCell: {
-    backgroundColor: "lightcoral",
+    backgroundColor: colors.lightPink,
     opacity: 0.9,
   },
-  canBeCheckedCell: {
-    backgroundColor: "lightyellow",
+  selectableCell: {
+    backgroundColor: colors.white,
+    borderWidth: 2,
+    borderColor: colors.blue,
+  },
+  selectableCellText: {
+    color: "#8b6d9c",
   },
   topBorder: {
     borderTopWidth: 1,

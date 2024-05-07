@@ -2,6 +2,9 @@ import React, { useState, useContext, useEffect } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { SocketContext } from "../../../contexts/socket.context";
 import Dice from "./dice.component";
+import Button from "../../button";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { colors } from "../../../constants/colors";
 
 const PlayerDeck = () => {
   const socket = useContext(SocketContext);
@@ -41,16 +44,6 @@ const PlayerDeck = () => {
     <View style={styles.deckPlayerContainer}>
       {displayPlayerDeck && (
         <>
-          {displayRollButton && (
-            <>
-              <View style={styles.rollInfoContainer}>
-                <Text style={styles.rollInfoText}>
-                  Lancer {rollsCounter} / {rollsMaximum}
-                </Text>
-              </View>
-            </>
-          )}
-
           <View style={styles.diceContainer}>
             {dices.map((diceData, index) => (
               <Dice
@@ -65,9 +58,11 @@ const PlayerDeck = () => {
 
           {displayRollButton && (
             <>
-              <TouchableOpacity style={styles.rollButton} onPress={rollDices}>
-                <Text style={styles.rollButtonText}>Roll</Text>
-              </TouchableOpacity>
+              <Button
+                onPress={rollDices}
+                text={`Lancer ${rollsCounter} / ${rollsMaximum}`}
+                iconName="dice"
+              />
             </>
           )}
         </>
@@ -82,14 +77,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderColor: "black",
-  },
-  rollInfoContainer: {
-    marginBottom: 10,
-  },
-  rollInfoText: {
-    fontSize: 14,
-    fontStyle: "italic",
   },
   diceContainer: {
     flexDirection: "row",
@@ -99,9 +86,9 @@ const styles = StyleSheet.create({
   },
   rollButton: {
     width: "30%",
-    backgroundColor: "black",
+    backgroundColor: "#494d7e",
     paddingVertical: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },
