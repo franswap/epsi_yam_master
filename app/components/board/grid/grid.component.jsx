@@ -1,9 +1,8 @@
-import React, { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { SocketContext } from "../../../contexts/socket.context";
 
 const Grid = () => {
-
   const socket = useContext(SocketContext);
 
   const [displayGrid, setDisplayGrid] = useState(false);
@@ -18,9 +17,9 @@ const Grid = () => {
 
   useEffect(() => {
     socket.on("game.grid.view-state", (data) => {
-      setDisplayGrid(data['displayGrid']);
-      setCanSelectCells(data['canSelectCells'])
-      setGrid(data['grid']);
+      setDisplayGrid(data["displayGrid"]);
+      setCanSelectCells(data["canSelectCells"]);
+      setGrid(data["grid"]);
     });
   }, []);
 
@@ -36,7 +35,10 @@ const Grid = () => {
                   styles.cell,
                   cell.owner === "player:1" && styles.playerOwnedCell,
                   cell.owner === "player:2" && styles.opponentOwnedCell,
-                  (cell.canBeChecked && !(cell.owner === "player:1") && !(cell.owner === "player:2")) && styles.canBeCheckedCell,
+                  cell.canBeChecked &&
+                    !(cell.owner === "player:1") &&
+                    !(cell.owner === "player:2") &&
+                    styles.canBeCheckedCell,
                   rowIndex !== 0 && styles.topBorder,
                   cellIndex !== 0 && styles.leftBorder,
                 ]}
