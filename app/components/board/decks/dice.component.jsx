@@ -2,11 +2,7 @@ import React from "react";
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
 
 const Dice = ({ index, locked, value, onPress, opponent }) => {
-  const handlePress = () => {
-    if (!opponent) {
-      onPress(index);
-    }
-  };
+  const handlePress = () => onPress(index, opponent);
 
   return (
     <TouchableOpacity
