@@ -21,7 +21,7 @@ let games = [];
 
 const emitToPlayers = (game, event, argsPlayer1, argsPlayer2) => {
   game.player1Socket.emit(event, argsPlayer1);
-  if (!game.gameState.hasBot) {
+  if (!game.player2Socket.isBot) {
     game.player2Socket.emit(event, argsPlayer2);
   }
 };
@@ -125,21 +125,7 @@ const updateGameInterval = (game) => {
     updateClientsViewGrid(game);
 
     // Bot turn
-    // Roll dices
-    if (game.gameState.hasBot && game.gameState.currentTurn === "player:2") {
-      for (let i = 0; i < 3; i++) {
-        setTimeout(() => {
-          const dices = GameService.dices.roll(game.gameState.deck.dices);
-          game.gameState.deck.dices = dices;
-          game.gameState.deck.rollsCounter++;
-          updateClientsViewDecks(game);
-          updateClientsViewChoices(game);
-          if (i === 2) {
-            game.gameState.timer = 5;
-          }
-        }, 2000 * (i + 1));
-      }
-    }
+    botRollDices(game);
   }
   // Update clients view timers
   updateClientsViewTimers(game);
@@ -149,9 +135,11 @@ const handlePlayersDisconnects = (game, gameInterval) => {
   game.player1Socket.on("disconnect", () => {
     clearInterval(gameInterval);
   });
-  game.player2Socket.on("disconnect", () => {
-    clearInterval(gameInterval);
-  });
+  if (!game.player2Socket.isBot) {
+    game.player2Socket.on("disconnect", () => {
+      clearInterval(gameInterval);
+    });
+  }
 };
 
 const createGame = (player1Socket, player2Socket) => {
@@ -163,7 +151,15 @@ const createGame = (player1Socket, player2Socket) => {
   const newGame = GameService.init.gameState();
   newGame["idGame"] = uniqid();
   newGame["player1Socket"] = player1Socket;
-  newGame["player2Socket"] = player2Socket;
+
+  if (player2Socket === "bot") {
+    newGame["player2Socket"] = { id: "bot" + newGame["idGame"], isBot: true };
+    newGame.gameState.hasBot = true;
+    console.log("createBotGame");
+  } else {
+    newGame["player2Socket"] = player2Socket;
+  }
+
   games.push(newGame);
 
   // Send game start event to players
@@ -173,6 +169,7 @@ const createGame = (player1Socket, player2Socket) => {
   updateClientsViewTimers(newGame);
   updateClientsViewDecks(newGame);
   updateClientsViewGrid(newGame);
+  updateClientsViewPawns(newGame);
 
   // Timer every second
   const gameInterval = setInterval(() => updateGameInterval(newGame), 1000);
@@ -180,31 +177,6 @@ const createGame = (player1Socket, player2Socket) => {
   // When a player disconnects, we clear the timer
   handlePlayersDisconnects(newGame, gameInterval);
 };
-
-function createBotGame(player1Socket) {
-  // init botGame
-  let newGame = GameService.init.gameState();
-  newGame["idGame"] = uniqid();
-  newGame["player1Socket"] = player1Socket;
-  newGame["player2Socket"] = player1Socket;
-  newGame["gameState"]["hasBot"] = true;
-  games.push(newGame);
-  console.log("createBotGame");
-
-  // Send game start event to players
-  emitClientsViewGameStart(newGame);
-
-  // Update clients view
-  updateClientsViewTimers(newGame);
-  updateClientsViewDecks(newGame);
-  updateClientsViewGrid(newGame);
-
-  // Timer every second
-  const gameInterval = setInterval(() => updateGameInterval(newGame), 1000);
-
-  // When a player disconnects, we clear the timer
-  handlePlayersDisconnects(newGame, gameInterval);
-}
 
 const newPlayerInQueue = (socket) => {
   queue.push(socket);
@@ -226,6 +198,26 @@ const leaveQueue = (socket) => {
   socket.emit("queue.removed", GameService.send.forPlayer.queueViewState());
 };
 
+const botRollDices = (game) => {
+  console.log("botRollDices");
+  if (game.gameState.hasBot && game.gameState.currentTurn === "player:2") {
+    console.log("isBot");
+    for (let i = 0; i < 3; i++) {
+      console.log("botRollDices", i);
+      setTimeout(() => {
+        const dices = GameService.dices.roll(game.gameState.deck.dices);
+        game.gameState.deck.dices = dices;
+        game.gameState.deck.rollsCounter++;
+        updateClientsViewDecks(game);
+        updateClientsViewChoices(game);
+        if (i === 2) {
+          game.gameState.timer = 5;
+        }
+      }, 2000 * (i + 1));
+    }
+  }
+};
+
 // ---------------------------------------
 // -------- SOCKETS MANAGEMENT -----------
 // ---------------------------------------
@@ -245,7 +237,7 @@ io.on("connection", (socket) => {
 
   socket.on("vsbot.join", () => {
     console.log(`[${socket.id}] player start a game against the bot`);
-    createBotGame(socket);
+    createGame(socket, "bot");
   });
 
   socket.on("game.dices.roll", () => {
@@ -394,21 +386,7 @@ io.on("connection", (socket) => {
     game.gameState.choices = GameService.init.choices();
 
     // Bot turn
-    // Roll dices
-    if (game.gameState.hasBot && game.gameState.currentTurn === "player:2") {
-      for (let i = 0; i < 3; i++) {
-        setTimeout(() => {
-          const dices = GameService.dices.roll(game.gameState.deck.dices);
-          game.gameState.deck.dices = dices;
-          game.gameState.deck.rollsCounter++;
-          updateClientsViewDecks(game);
-          updateClientsViewChoices(game);
-          if (i === 2) {
-            game.gameState.timer = 5;
-          }
-        }, 2000 * (i + 1));
-      }
-    }
+    botRollDices(game);
 
     // et on remet à jour les vues
     updateClientsViewPawns(game);
