@@ -1,10 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { SocketContext } from "../../../contexts/socket.context";
 import Dice from "./dice.component";
 import Button from "../../button";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { colors } from "../../../constants/colors";
 
 const PlayerDeck = () => {
   const socket = useContext(SocketContext);
@@ -27,10 +25,12 @@ const PlayerDeck = () => {
     });
   }, []);
 
-  const toggleDiceLock = (index) => {
-    const newDices = [...dices];
-    if (newDices[index].value !== "" && displayRollButton) {
-      socket.emit("game.dices.lock", newDices[index].id);
+  const toggleDiceLock = (index, opponent) => {
+    if (!opponent) {
+      const newDices = [...dices];
+      if (newDices[index].value !== "" && displayRollButton) {
+        socket.emit("game.dices.lock", newDices[index].id);
+      }
     }
   };
 
@@ -52,6 +52,7 @@ const PlayerDeck = () => {
                 locked={diceData.locked}
                 value={diceData.value}
                 onPress={toggleDiceLock}
+                opponent={false}
               />
             ))}
           </View>
@@ -76,7 +77,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    borderBottomWidth: 1,
   },
   diceContainer: {
     flexDirection: "row",

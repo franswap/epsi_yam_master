@@ -14,14 +14,14 @@ const OpponentPawns = () => {
   }, []);
 
   return (
-    <View style={styles.playerPawnsContainer}>
+    <View style={styles.opponentPawnsContainer}>
       <Text style={styles.opponentPawnsText}>Pawns: {opponentPawns}</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  playerPawnsContainer: {
+  opponentPawnsContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SocketContext } from "../contexts/socket.context";
 import Board from "../components/board/board.component";
 import Header from "../components/header";
@@ -62,20 +62,25 @@ export default function OnlineGameController({ navigation }) {
       {!inQueue && !inGame && (
         <>
           <Header />
-          <Text style={[styles.paragraph, styles.spaccing]}>
-            Waiting for server datas...
+          <Text style={[styles.paragraph, styles.spacing]}>
+            En attente du serveur...
           </Text>
+          <Button
+            onPress={() => navigation.navigate("HomeScreen")}
+            text="Revenir au menu"
+            iconName="home"
+          />
         </>
       )}
 
       {inQueue && (
-        <View style={styles.container}>
+        <>
           <Header />
-          <Text style={[styles.paragraph, styles.spaccing]}>
-            En attente dun autre joueur...
+          <Text style={[styles.paragraph, styles.spacing]}>
+            En attente d'un autre joueur...
           </Text>
           <Button onPress={leaveQueue} text="Quitter la file" iconName="home" />
-        </View>
+        </>
       )}
 
       {inGame && <Board />}
@@ -97,23 +102,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#8B6D9C",
   },
-  button: {
-    backgroundColor: "#F2D3AB",
-    borderRadius: 25,
-    color: "#494D7E",
-    height: 60,
-    width: 250,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    letterSpacing: "0%",
-    color: "#494D7E",
-  },
-  spaccing: {
+  spacing: {
     paddingTop: 30,
     paddingBottom: 30,
   },
