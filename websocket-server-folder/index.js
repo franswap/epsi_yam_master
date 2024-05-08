@@ -115,7 +115,7 @@ const updateGameInterval = (game) => {
     game.gameState.timer = GameService.timer.getTurnDuration();
     game.gameState.deck = GameService.init.deck();
     game.gameState.choices = GameService.init.choices();
-    game.gameState.grid = GameService.grid.resetcanBeCheckedCells(
+    game.gameState.grid = GameService.grid.resetCanBeCheckedCells(
       game.gameState.grid
     );
 
@@ -125,7 +125,7 @@ const updateGameInterval = (game) => {
     updateClientsViewGrid(game);
 
     // Bot turn
-    botRollDices(game);
+    botPlay(game);
   }
   // Update clients view timers
   updateClientsViewTimers(game);
@@ -198,22 +198,160 @@ const leaveQueue = (socket) => {
   socket.emit("queue.removed", GameService.send.forPlayer.queueViewState());
 };
 
-const botRollDices = (game) => {
-  console.log("botRollDices");
+const rollDices = (game) => {
+  // Enlève la surbrillance des cases précédemment cliquables
+  game.gameState.grid = GameService.grid.resetCanBeCheckedCells(
+    game.gameState.grid
+  );
+
+  // Roll dices
+  const dices = GameService.dices.roll(game.gameState.deck.dices);
+  game.gameState.deck.dices = dices;
+  game.gameState.deck.rollsCounter++;
+
+  // Constants for rolls management
+  const rollsCounter = game.gameState.deck.rollsCounter;
+  const rollsMaximum = game.gameState.deck.rollsMaximum;
+  const isDefi = false;
+  const isSec = rollsCounter === 2;
+  const combinations = GameService.choices.findCombinations(
+    dices,
+    isDefi,
+    isSec
+  );
+
+  // Update available choices
+  game.gameState.choices.availableChoices = combinations;
+
+  // if last roll we lock every dice
+  if (rollsCounter - 1 === rollsMaximum) {
+    game.gameState.deck.dices = GameService.dices.lockEveryDice(dices);
+    game.gameState.timer = 5;
+  }
+
+  // Update clients view
+  updateClientsViewDecks(game);
+  updateClientsViewChoices(game);
+  updateClientsViewGrid(game);
+};
+
+const selectChoice = (game, idChoice) => {
+  // Gestion des choix
+  game.gameState.choices.idSelectedChoice = idChoice;
+
+  // Enlève la surbrillance des cases précédemment cliquables et met en surbrillance les cases cliquables (quand on change de choix)
+  game.gameState.grid = GameService.grid.resetCanBeCheckedCells(
+    game.gameState.grid
+  );
+  game.gameState.grid = GameService.grid.updateGridAfterSelectingChoice(
+    idChoice,
+    game.gameState.grid
+  );
+
+  updateClientsViewChoices(game);
+  updateClientsViewGrid(game);
+};
+
+const selectCell = (game, cellId, rowIndex, cellIndex) => {
+  // La sélection d'une cellule signifie la fin du tour (ou plus tard le check des conditions de victoires)
+  // On reset l'état des cases qui étaient précédemment cliquables.
+  game.gameState.grid = GameService.grid.resetCanBeCheckedCells(
+    game.gameState.grid
+  );
+  game.gameState.grid = GameService.grid.selectCell(
+    cellId,
+    rowIndex,
+    cellIndex,
+    game.gameState.currentTurn,
+    game.gameState.grid
+  );
+
+  // Calcul du score d'un joueur et du gagnant
+  const { score, winner } = GameService.utils.calculateScore(
+    game.gameState.currentTurn,
+    game.gameState.grid
+  );
+
+  // Décrementation des pionts lorsqu'un joueur en place un + Mise à jour du score
+  if (game.gameState.currentTurn === "player:1") {
+    game.gameState.player1Pawns--;
+    game.gameState.player1Score = score;
+  } else if (game.gameState.currentTurn === "player:2") {
+    game.gameState.player2Pawns--;
+    game.gameState.player2Score = score;
+  }
+
+  // Puis check si la partie s'arrête (plus de pions ou gagnant trouvé avec calculateScore)
+  const hasNoMorePawns =
+    game.gameState.player1Pawns === 0 || game.gameState.player2Pawns === 0; // Plus de pions
+
+  // Mise à jour du gagnant
+  if (hasNoMorePawns || winner) {
+    if (winner) {
+      game.gameState.winner = winner;
+    } else if (game.gameState.player1Score > game.gameState.player2Score) {
+      game.gameState.winner = "player:1";
+    } else if (game.gameState.player1Score < game.gameState.player2Score) {
+      game.gameState.winner = "player:2";
+    } else {
+      game.gameState.winner = null;
+    }
+  }
+
+  // Si la partie est terminée, on met à jour la vue de fin
+  if (game.gameState.winner || hasNoMorePawns) {
+    updateClientsViewEnd(game);
+  }
+
+  // Sinon on finit le tour
+  else
+    game.gameState.currentTurn =
+      game.gameState.currentTurn === "player:1" ? "player:2" : "player:1";
+
+  // On remet le timer, le deck et les choix par défaut (la grille ne change pas)
+  game.gameState.timer = GameService.timer.getTurnDuration();
+  game.gameState.deck = GameService.init.deck();
+  game.gameState.choices = GameService.init.choices();
+
+  // et on remet à jour les vues
+  updateClientsViewPawns(game);
+  updateClientsViewScore(game);
+  updateClientsViewDecks(game);
+  updateClientsViewChoices(game);
+  updateClientsViewGrid(game);
+  updateClientsViewTimers(game);
+};
+
+const botEasyMakeDecision = async (game) => {
+  // Loop through all available
+  for (let i = 0; i < game.gameState.choices.availableChoices.length; i++) {
+    const choice = game.gameState.choices.availableChoices[i];
+    await delay(2000);
+    selectChoice(game, choice.id);
+
+    // Find cell that can be checked
+    const resultFindCell = GameService.grid.findCellCanBeChecked(
+      game.gameState.grid
+    );
+    if (resultFindCell) {
+      const { cell, rowIndex, cellIndex } = resultFindCell;
+      await delay(2000);
+      selectCell(game, cell.id, rowIndex, cellIndex);
+      break; // Exit loop
+    }
+  }
+};
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const botPlay = async (game) => {
   if (game.gameState.hasBot && game.gameState.currentTurn === "player:2") {
-    console.log("isBot");
     for (let i = 0; i < 3; i++) {
-      console.log("botRollDices", i);
-      setTimeout(() => {
-        const dices = GameService.dices.roll(game.gameState.deck.dices);
-        game.gameState.deck.dices = dices;
-        game.gameState.deck.rollsCounter++;
-        updateClientsViewDecks(game);
-        updateClientsViewChoices(game);
-        if (i === 2) {
-          game.gameState.timer = 5;
-        }
-      }, 2000 * (i + 1));
+      if (game.gameState.hasBot && game.gameState.currentTurn === "player:2") {
+        await delay(2000);
+        rollDices(game);
+        await botEasyMakeDecision(game);
+      } else break;
     }
   }
 };
@@ -248,34 +386,7 @@ io.on("connection", (socket) => {
     );
     const game = games[gameIndex];
 
-    // Roll dices
-    const dices = GameService.dices.roll(game.gameState.deck.dices);
-    game.gameState.deck.dices = dices;
-    game.gameState.deck.rollsCounter++;
-
-    // Constants for rolls management
-    const rollsCounter = game.gameState.deck.rollsCounter;
-    const rollsMaximum = game.gameState.deck.rollsMaximum;
-    const isDefi = false;
-    const isSec = rollsCounter === 2;
-    const combinations = GameService.choices.findCombinations(
-      dices,
-      isDefi,
-      isSec
-    );
-
-    // Update available choices
-    game.gameState.choices.availableChoices = combinations;
-
-    // if last roll we lock every dice
-    if (rollsCounter - 1 === rollsMaximum) {
-      game.gameState.deck.dices = GameService.dices.lockEveryDice(dices);
-      game.gameState.timer = 5;
-    }
-
-    // Update clients view
-    updateClientsViewDecks(game);
-    updateClientsViewChoices(game);
+    rollDices(game);
   });
 
   socket.on("game.dices.lock", (idDice) => {
@@ -294,7 +405,7 @@ io.on("connection", (socket) => {
     updateClientsViewDecks(games[gameIndex]);
   });
 
-  socket.on("game.choices.selected", (data) => {
+  socket.on("game.choices.selected", (idChoice) => {
     // Get game
     const gameIndex = GameService.utils.findGameIndexBySocketId(
       games,
@@ -302,98 +413,20 @@ io.on("connection", (socket) => {
     );
     const game = games[gameIndex];
 
-    // Gestion des choix
-    game.gameState.choices.idSelectedChoice = data.choiceId;
-
-    // Gestions de la grille
-    game.gameState.grid = GameService.grid.resetcanBeCheckedCells(
-      game.gameState.grid
-    );
-    game.gameState.grid = GameService.grid.updateGridAfterSelectingChoice(
-      data.choiceId,
-      game.gameState.grid
-    );
-
-    updateClientsViewChoices(game);
-    updateClientsViewGrid(game);
+    selectChoice(game, idChoice);
   });
 
-  socket.on("game.grid.selected", (data) => {
+  socket.on("game.grid.selected", ({ cellId, rowIndex, cellIndex }) => {
     const gameIndex = GameService.utils.findGameIndexBySocketId(
       games,
       socket.id
     );
     const game = games[gameIndex];
 
-    // La sélection d'une cellule signifie la fin du tour (ou plus tard le check des conditions de victoires)
-    // On reset l'état des cases qui étaient précédemment cliquables.
-    game.gameState.grid = GameService.grid.resetcanBeCheckedCells(
-      game.gameState.grid
-    );
-    game.gameState.grid = GameService.grid.selectCell(
-      data.cellId,
-      data.rowIndex,
-      data.cellIndex,
-      game.gameState.currentTurn,
-      game.gameState.grid
-    );
-
-    // Calcul du score d'un joueur et du gagnant
-    const { score, winner } = GameService.utils.calculateScore(
-      game.gameState.currentTurn,
-      game.gameState.grid
-    );
-
-    // Décrementation des pionts lorsqu'un joueur en place un + Mise à jour du score
-    if (game.gameState.currentTurn === "player:1") {
-      game.gameState.player1Pawns--;
-      game.gameState.player1Score = score;
-    } else if (game.gameState.currentTurn === "player:2") {
-      game.gameState.player2Pawns--;
-      game.gameState.player2Score = score;
-    }
-
-    // Puis check si la partie s'arrête (plus de pions ou gagnant trouvé avec calculateScore)
-    const hasNoMorePawns =
-      game.gameState.player1Pawns === 0 || game.gameState.player2Pawns === 0; // Plus de pions
-
-    // Mise à jour du gagnant
-    if (hasNoMorePawns || winner) {
-      if (winner) {
-        game.gameState.winner = winner;
-      } else if (game.gameState.player1Score > game.gameState.player2Score) {
-        game.gameState.winner = "player:1";
-      } else if (game.gameState.player1Score < game.gameState.player2Score) {
-        game.gameState.winner = "player:2";
-      } else {
-        game.gameState.winner = null;
-      }
-    }
-
-    // Si la partie est terminée, on met à jour la vue de fin
-    if (game.gameState.winner || hasNoMorePawns) {
-      updateClientsViewEnd(game);
-    }
-
-    // Sinon on finit le tour
-    else
-      game.gameState.currentTurn =
-        game.gameState.currentTurn === "player:1" ? "player:2" : "player:1";
-
-    // On remet le timer, le deck et les choix par défaut (la grille ne change pas)
-    game.gameState.timer = GameService.timer.getTurnDuration();
-    game.gameState.deck = GameService.init.deck();
-    game.gameState.choices = GameService.init.choices();
+    selectCell(game, cellId, rowIndex, cellIndex);
 
     // Bot turn
-    botRollDices(game);
-
-    // et on remet à jour les vues
-    updateClientsViewPawns(game);
-    updateClientsViewScore(game);
-    updateClientsViewDecks(game);
-    updateClientsViewChoices(game);
-    updateClientsViewGrid(game);
+    botPlay(game);
   });
 
   socket.on("disconnect", (reason) => {

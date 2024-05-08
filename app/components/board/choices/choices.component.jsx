@@ -29,7 +29,7 @@ const Choices = () => {
   const handleSelectChoice = (choiceId) => {
     if (canMakeChoice) {
       setIdSelectedChoice(choiceId);
-      socket.emit("game.choices.selected", { choiceId });
+      socket.emit("game.choices.selected", choiceId);
     }
   };
 
