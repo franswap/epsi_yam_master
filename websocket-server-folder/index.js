@@ -379,52 +379,32 @@ io.on("connection", (socket) => {
   });
 
   socket.on("game.dices.roll", () => {
-    // Get game
-    const gameIndex = GameService.utils.findGameIndexBySocketId(
-      games,
-      socket.id
-    );
-    const game = games[gameIndex];
-
+    const game = GameService.utils.findGameBySocketId(games, socket.id);
     rollDices(game);
   });
 
   socket.on("game.dices.lock", (idDice) => {
-    const gameIndex = GameService.utils.findGameIndexBySocketId(
-      games,
-      socket.id
-    );
+    const game = GameService.utils.findGameBySocketId(games, socket.id);
+
     const diceIndex = GameService.utils.findDiceIndexByDiceId(
-      games[gameIndex].gameState.deck.dices,
+      game.gameState.deck.dices,
       idDice
     );
 
-    games[gameIndex].gameState.deck.dices[diceIndex].locked =
-      !games[gameIndex].gameState.deck.dices[diceIndex].locked;
+    game.gameState.deck.dices[diceIndex].locked =
+      !game.gameState.deck.dices[diceIndex].locked;
 
-    updateClientsViewDecks(games[gameIndex]);
+    updateClientsViewDecks(game);
   });
 
   socket.on("game.choices.selected", (idChoice) => {
-    // Get game
-    const gameIndex = GameService.utils.findGameIndexBySocketId(
-      games,
-      socket.id
-    );
-    const game = games[gameIndex];
-
+    const game = GameService.utils.findGameBySocketId(games, socket.id);
     selectChoice(game, idChoice);
   });
 
   socket.on("game.grid.selected", ({ cellId, rowIndex, cellIndex }) => {
-    const gameIndex = GameService.utils.findGameIndexBySocketId(
-      games,
-      socket.id
-    );
-    const game = games[gameIndex];
-
+    const game = GameService.utils.findGameBySocketId(games, socket.id);
     selectCell(game, cellId, rowIndex, cellIndex);
-
     // Bot turn
     botPlay(game);
   });

@@ -412,6 +412,18 @@ const GameService = {
       return -1;
     },
 
+    findGameBySocketId: (games, socketId) => {
+      for (let i = 0; i < games.length; i++) {
+        if (
+          games[i].player1Socket.id === socketId ||
+          games[i].player2Socket.id === socketId
+        ) {
+          return games[i]; // Retourne le jeu si le socket est trouvé
+        }
+      }
+      return null;
+    },
+
     findDiceIndexByDiceId: (dices, idDice) => {
       for (let i = 0; i < dices.length; i++) {
         if (dices[i].id === idDice) {
