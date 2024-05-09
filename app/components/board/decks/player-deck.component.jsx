@@ -77,25 +77,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  diceContainer: {
-    flexDirection: "row",
-    width: "70%",
-    justifyContent: "space-between",
     marginBottom: 10,
   },
-  rollButton: {
-    width: "30%",
-    backgroundColor: "#494d7e",
-    paddingVertical: 10,
-    borderRadius: 10,
-    justifyContent: "center",
+  diceContainer: {
+    flex: 1,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
     alignItems: "center",
-  },
-  rollButtonText: {
-    fontSize: 18,
-    color: "white",
-    fontWeight: "bold",
   },
 });
 

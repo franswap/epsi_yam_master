@@ -42,14 +42,16 @@ const OpponentDeck = () => {
 const styles = StyleSheet.create({
   deckOpponentContainer: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-evenly",
     alignItems: "center",
+    width: "100%",
   },
   diceContainer: {
+    flex: 1,
+    width: "100%",
     flexDirection: "row",
-    width: "70%",
-    justifyContent: "space-between",
-    marginBottom: 10,
+    justifyContent: "space-evenly",
+    alignItems: "center",
   },
 });
 
