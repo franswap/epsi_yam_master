@@ -153,7 +153,7 @@ const createGame = (player1Socket, player2Socket, data) => {
   // - idGame : just in case ;)
   // - player1Socket: socket instance key "joueur:1"
   // - player2Socket: socket instance key "joueur:2"
-  const newGame = GameService.init.gameState();
+  const newGame = JSON.parse(JSON.stringify(GameService.init.gameState()));
   newGame["idGame"] = uniqid();
   newGame["player1Socket"] = player1Socket;
 
