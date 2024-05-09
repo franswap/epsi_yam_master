@@ -3,6 +3,9 @@ import { Text, TouchableOpacity, StyleSheet } from "react-native";
 
 const Dice = ({ index, locked, value, onPress, opponent }) => {
   const handlePress = () => onPress(index, opponent);
+  const windowWidth = window.innerWidth;
+  const diceWidth = windowWidth <= "600" ? windowWidth / 5 - 1 : 65;
+  const styles = createStyles(diceWidth);
 
   return (
     <TouchableOpacity
@@ -15,10 +18,10 @@ const Dice = ({ index, locked, value, onPress, opponent }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = StyleSheet.create((diceWidth) => ({
   dice: {
-    width: 70,
-    height: 70,
+    width: diceWidth,
+    height: diceWidth,
     backgroundColor: "white",
     borderRadius: 10,
     justifyContent: "center",
@@ -36,6 +39,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "red",
   },
-});
+}));
 
 export default Dice;
