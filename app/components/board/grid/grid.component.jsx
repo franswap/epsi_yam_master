@@ -1,7 +1,7 @@
 import { useEffect, useContext, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { SocketContext } from "../../../contexts/socket.context";
-import { colors } from "../../../constants/colors";
+import GridItem from "./grid-item.component";
 
 const Grid = () => {
   const socket = useContext(SocketContext);
@@ -33,28 +33,12 @@ const Grid = () => {
               const isSelectable = cell.canBeChecked && !cell.owner;
 
               return (
-                <TouchableOpacity
+                <GridItem
                   key={cell.id}
-                  style={[
-                    styles.cell,
-                    cell.owner === "player:1" && styles.playerOwnedCell,
-                    cell.owner === "player:2" && styles.opponentOwnedCell,
-                    isSelectable && styles.selectableCell,
-                    rowIndex !== 0 && styles.topBorder,
-                    cellIndex !== 0 && styles.leftBorder,
-                  ]}
+                  cell={cell}
+                  isSelectable={isSelectable}
                   onPress={() => handleSelectCell(cell.id, rowIndex, cellIndex)}
-                  disabled={!isSelectable}
-                >
-                  <Text
-                    style={[
-                      styles.cellText,
-                      isSelectable && styles.selectableCellText,
-                    ]}
-                  >
-                    {cell.viewContent}
-                  </Text>
-                </TouchableOpacity>
+                />
               );
             })}
           </View>
@@ -77,45 +61,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     margin: 1,
-  },
-  cell: {
-    flexDirection: "row",
-    flex: 2,
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    borderColor: "#8b6d9c",
-    backgroundColor: "#8b6d9c",
-    borderRadius: 10,
-    margin: 1,
-  },
-  cellText: {
-    fontSize: 20,
-    color: "white",
-    fontWeight: "bold",
-  },
-  playerOwnedCell: {
-    backgroundColor: colors.beige,
-    opacity: 0.9,
-  },
-  opponentOwnedCell: {
-    backgroundColor: colors.lightPink,
-    opacity: 0.9,
-  },
-  selectableCell: {
-    backgroundColor: colors.white,
-    borderWidth: 2,
-    borderColor: colors.blue,
-  },
-  selectableCellText: {
-    color: "#8b6d9c",
-  },
-  topBorder: {
-    borderTopWidth: 1,
-  },
-  leftBorder: {
-    borderLeftWidth: 1,
   },
 });
 

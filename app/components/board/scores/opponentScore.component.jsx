@@ -15,9 +15,7 @@ const OpponentScore = () => {
 
   return (
     <View style={styles.playerScoreContainer}>
-      <Text style={styles.opponentScoreText}>
-        Opponent Score: {opponentScore}
-      </Text>
+      <Text style={styles.opponentScoreText}>Score: {opponentScore}</Text>
     </View>
   );
 };

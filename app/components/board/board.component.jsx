@@ -6,7 +6,7 @@ import PlayerTimer from "./timers/player-timer.component";
 import OpponentTimer from "./timers/opponent-timer.component";
 import Choices from "./choices/choices.component";
 import Grid from "./grid/grid.component";
-import PlayerPawns from "./pawns/pawns.component";
+import PlayerPawns from "./pawns/playerPawns.component";
 import PlayerScore from "./scores/playerScore.component";
 import OpponentScore from "./scores/opponentScore.component";
 import OpponentPawns from "./pawns/opponentPawns.component";
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "100%",
+    width: "600px",
     height: "100%",
     backgroundColor: "#272744",
   },
@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
     flex: 7,
     justifyContent: "center",
     alignItems: "center",
-    borderRightWidth: 1,
     backgroundColor: "#494d7e",
   },
   opponentInfosText: {
@@ -113,52 +112,10 @@ const styles = StyleSheet.create({
     color: "white",
     backgroundColor: "#494d7e",
   },
-  opponentTimerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    color: "white",
-    backgroundColor: "#494d7e",
-  },
-  opponentScoreContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    color: "white",
-    backgroundColor: "#494d7e",
-  },
-  deckOpponentContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    backgroundColor: "white",
-  },
-  gridContainer: {
-    flex: 7,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRightWidth: 1,
-    borderColor: "black",
-  },
-  choicesContainer: {
-    flex: 3,
-    justifyContent: "center",
-    alignItems: "center",
-    color: "#f2d3ab",
-    backgroundColor: "#494d7e",
-  },
-  deckPlayerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#494d7e",
-  },
   playerInfosContainer: {
     flex: 7,
     justifyContent: "center",
     alignItems: "center",
-    borderRightWidth: 1,
     color: "white",
     backgroundColor: "#494d7e",
   },
@@ -166,28 +123,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  playerTimerScoreContainer: {
-    flex: 3,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    color: "white",
-    backgroundColor: "#494d7e",
-  },
-  playerTimerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    color: "white",
-    backgroundColor: "#494d7e",
-  },
-  playerScoreContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    color: "white",
-    backgroundColor: "#494d7e",
   },
 });
 

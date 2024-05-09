@@ -1,12 +1,7 @@
 import { useState, useEffect, useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { SocketContext } from "../../../contexts/socket.context";
+import Choice from "./choice.component";
 import { colors } from "../../../constants/colors";
 
 const Choices = () => {
@@ -48,18 +43,13 @@ const Choices = () => {
         >
           {displayChoices &&
             availableChoices.map((choice) => (
-              <TouchableOpacity
+              <Choice
                 key={choice.id}
-                style={[
-                  styles.choiceButton,
-                  idSelectedChoice === choice.id && styles.selectedChoice,
-                  !canMakeChoice && styles.disabledChoice,
-                ]}
-                onPress={() => handleSelectChoice(choice.id)}
-                disabled={!canMakeChoice}
-              >
-                <Text style={styles.choiceText}>{choice.value}</Text>
-              </TouchableOpacity>
+                choice={choice}
+                idSelectedChoice={idSelectedChoice}
+                canMakeChoice={canMakeChoice}
+                onPress={handleSelectChoice}
+              />
             ))}
         </ScrollView>
       )}
@@ -89,37 +79,16 @@ const styles = StyleSheet.create({
   choicesScrollView: {
     flex: 1,
   },
-  choiceButton: {
-    backgroundColor: "#f2d3ab",
-    borderRadius: 5,
-    margin: 5,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "90px",
-    height: "35px",
-  },
-  selectedChoice: {
-    backgroundColor: "#c69fa5",
-  },
   choiceTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: colors.white,
     marginLeft: 15,
   },
-  choiceText: {
-    fontSize: 13,
-    fontWeight: "bold",
-    color: "#494d7e",
-  },
   noChoicesText: {
     fontSize: 13,
     fontWeight: "bold",
     color: colors.white,
-  },
-  disabledChoice: {
-    opacity: 0.5,
   },
 });
 

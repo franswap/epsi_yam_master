@@ -323,7 +323,7 @@ const selectCell = (game, cellId, rowIndex, cellIndex) => {
 };
 
 const botEasyMakeDecision = async (game) => {
-  // Loop through all available
+  // Loop through all choices available
   for (let i = 0; i < game.gameState.choices.availableChoices.length; i++) {
     const choice = game.gameState.choices.availableChoices[i];
     await delay(2000);

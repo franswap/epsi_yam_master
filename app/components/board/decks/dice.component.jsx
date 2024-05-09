@@ -2,11 +2,7 @@ import React from "react";
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
 
 const Dice = ({ index, locked, value, onPress, opponent }) => {
-  const handlePress = () => {
-    if (!opponent) {
-      onPress(index);
-    }
-  };
+  const handlePress = () => onPress(index, opponent);
 
   return (
     <TouchableOpacity
@@ -21,8 +17,8 @@ const Dice = ({ index, locked, value, onPress, opponent }) => {
 
 const styles = StyleSheet.create({
   dice: {
-    width: 40,
-    height: 40,
+    width: 70,
+    height: 70,
     backgroundColor: "white",
     borderRadius: 10,
     justifyContent: "center",
