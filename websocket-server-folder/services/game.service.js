@@ -85,7 +85,10 @@ const GAME_INIT = {
     grid: [],
     choices: {},
     deck: {},
-    hasBot: false,
+    bot: {
+      hasBot: false,
+      difficulty: null,
+    },
   },
 };
 

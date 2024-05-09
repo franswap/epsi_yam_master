@@ -142,7 +142,7 @@ const handlePlayersDisconnects = (game, gameInterval) => {
   }
 };
 
-const createGame = (player1Socket, player2Socket) => {
+const createGame = (player1Socket, player2Socket, data) => {
   // init objet (game) with this first level of structure:
   // - gameState : { .. evolutive object .. }
   // - idGame : just in case ;)
@@ -154,7 +154,8 @@ const createGame = (player1Socket, player2Socket) => {
 
   if (player2Socket === "bot") {
     newGame["player2Socket"] = { id: "bot" + newGame["idGame"], isBot: true };
-    newGame.gameState.hasBot = true;
+    newGame.gameState.bot.hasBot = true;
+    newGame.gameState.bot.difficulty = data.difficulty;
     console.log("createBotGame");
   } else {
     newGame["player2Socket"] = player2Socket;
@@ -185,7 +186,7 @@ const newPlayerInQueue = (socket) => {
   if (queue.length >= 2) {
     const player1Socket = queue.shift();
     const player2Socket = queue.shift();
-    createGame(player1Socket, player2Socket);
+    createGame(player1Socket, player2Socket, null);
   } else {
     socket.emit("queue.added", GameService.send.forPlayer.queueViewState());
   }
@@ -345,12 +346,23 @@ const botEasyMakeDecision = async (game) => {
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const botPlay = async (game) => {
-  if (game.gameState.hasBot && game.gameState.currentTurn === "player:2") {
+  if (game.gameState.bot.hasBot && game.gameState.currentTurn === "player:2") {
     for (let i = 0; i < 3; i++) {
-      if (game.gameState.hasBot && game.gameState.currentTurn === "player:2") {
+      if (
+        game.gameState.bot.hasBot &&
+        game.gameState.currentTurn === "player:2"
+      ) {
         await delay(2000);
         rollDices(game);
-        await botEasyMakeDecision(game);
+
+        // make decision based on difficulty
+        if (game.gameState.bot.difficulty === 1) {
+          await botEasyMakeDecision(game);
+        } else if (game.gameState.bot.difficulty === 2) {
+          await botEasyMakeDecision(game);
+        } else if (game.gameState.bot.difficulty === 3) {
+          await botEasyMakeDecision(game);
+        }
       } else break;
     }
   }
@@ -373,9 +385,9 @@ io.on("connection", (socket) => {
     leaveQueue(socket);
   });
 
-  socket.on("vsbot.join", () => {
+  socket.on("vsbot.join", (data) => {
     console.log(`[${socket.id}] player start a game against the bot`);
-    createGame(socket, "bot");
+    createGame(socket, "bot", data);
   });
 
   socket.on("game.dices.roll", () => {
