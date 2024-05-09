@@ -8,6 +8,7 @@ import Button from "../components/button";
 export default function VsBotGameController({ navigation }) {
   const socket = useContext(SocketContext);
   const [inGame, setInGame] = useState(false);
+  const [difficulty, setDifficulty] = useState(null);
 
   // Écouter l'événement 'game.end'
   useEffect(() => {
@@ -22,17 +23,53 @@ export default function VsBotGameController({ navigation }) {
   }, [navigation, socket]);
 
   useEffect(() => {
-    socket.emit("vsbot.join");
-
     socket.on("game.start", (data) => {
       console.log("[listen][game.start]:", data);
       setInGame(data["inGame"]);
     });
   }, []);
 
+  const handleDifficultyChange = (diff) => {
+    setDifficulty(diff);
+    socket.emit("vsbot.join", { difficulty: diff });
+  };
+
   return (
     <View style={styles.container}>
-      {!inGame && (
+      {!inGame && !difficulty && (
+        <>
+          <Header />
+          <Text style={[styles.paragraph, styles.spacing]}>
+            Sélectionnez la difficulté
+          </Text>
+          <Button
+            style={styles.mb20}
+            onPress={() => {
+              handleDifficultyChange(1);
+            }}
+            text="Facile"
+            iconNameMaterial="robot-happy"
+          />
+          <Button
+            style={styles.mb20}
+            onPress={() => {
+              handleDifficultyChange(2);
+            }}
+            text="Normal"
+            iconNameMaterial="robot"
+          />
+          <Button
+            style={styles.mb20}
+            onPress={() => {
+              handleDifficultyChange(3);
+            }}
+            text="Difficile"
+            iconNameMaterial="robot-angry"
+          />
+        </>
+      )}
+
+      {!inGame && difficulty && (
         <>
           <Header />
           <Text style={[styles.paragraph, styles.spacing]}>
@@ -68,5 +105,8 @@ const styles = StyleSheet.create({
   spacing: {
     paddingTop: 30,
     paddingBottom: 30,
+  },
+  mb20: {
+    marginBottom: 20,
   },
 });

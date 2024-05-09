@@ -11,12 +11,15 @@ const GameSummaryScreen = ({ route, navigation }) => {
     console.log(gameSummary);
   }, []);
 
-  // Pour info gameSummary = { isWinner, isLoser, isDraw, playerScore, opponentScore }
+  // Pour info gameSummary = {isOpponentDisconnected, isWinner, isLoser, isDraw, playerScore, opponentScore }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Résumé de la partie</Text>
       {gameSummary ? (
         <>
+          {gameSummary.isOpponentDisconnected && (
+            <Text style={styles.text}>L'adversaire s'est déconnecté.</Text>
+          )}
           {gameSummary.isWinner && (
             <Text style={styles.text}>Vous avez gagné !</Text>
           )}
