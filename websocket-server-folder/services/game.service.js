@@ -242,18 +242,32 @@ const GameService = {
       },
       // Créer le résumé de la partie
       gameSummary: (playerKey, gameState) => {
-        const { winner, player1Score, player2Score } = gameState;
+        const {
+          winner,
+          player1Score,
+          player2Score,
+          player1Socket,
+          player2Socket,
+        } = gameState;
 
+        const isOpponentDisconnected = !player1Socket || !player2Socket;
         const isWinner = playerKey === winner;
-        const isDraw = winner === null;
-        const isLoser = !isWinner && !isDraw;
+        const isDraw = winner === null && !isOpponentDisconnected;
+        const isLoser = !isWinner && !isDraw && !isOpponentDisconnected;
 
         const playerScore =
           playerKey === "player:1" ? player1Score : player2Score;
         const opponentScore =
           playerKey === "player:1" ? player2Score : player1Score;
 
-        return { isWinner, isLoser, isDraw, playerScore, opponentScore };
+        return {
+          isOpponentDisconnected,
+          isWinner,
+          isLoser,
+          isDraw,
+          playerScore,
+          opponentScore,
+        };
       },
     },
   },
@@ -435,6 +449,19 @@ const GameService = {
       }
       return -1;
     },
+
+    deleteGame: (games, game) => {
+      const gameIndex = games.indexOf(game);
+      if (gameIndex > -1) games.splice(gameIndex, 1);
+      return games;
+    },
+
+    removePlayerFromQueue: (queue, playerSocket) => {
+      const playerIndex = queue.indexOf(playerSocket);
+      if (playerIndex > -1) queue.splice(playerIndex, 1);
+      return queue;
+    },
+
     calculateScore: (playerKey, grid) => {
       function calculateAlignment(
         grid,

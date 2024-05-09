@@ -134,10 +134,15 @@ const updateGameInterval = (game) => {
 const handlePlayersDisconnects = (game, gameInterval) => {
   game.player1Socket.on("disconnect", () => {
     clearInterval(gameInterval);
+    updateClientsViewEnd(game);
+    games = GameService.utils.deleteGame(games, game);
   });
+
   if (!game.player2Socket.isBot) {
     game.player2Socket.on("disconnect", () => {
       clearInterval(gameInterval);
+      updateClientsViewEnd(game);
+      games = GameService.utils.deleteGame(games, game);
     });
   }
 };
@@ -347,6 +352,7 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const botPlay = async (game) => {
   if (game.gameState.bot.hasBot && game.gameState.currentTurn === "player:2") {
+    // 3 rolls max
     for (let i = 0; i < 3; i++) {
       if (
         game.gameState.bot.hasBot &&
@@ -423,6 +429,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", (reason) => {
     console.log(`[${socket.id}] socket disconnected - ${reason}`);
+    queue = GameService.utils.removePlayerFromQueue(queue, socket);
   });
 });
 
