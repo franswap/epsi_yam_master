@@ -1,12 +1,26 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons"; // Importation des icônes
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors } from "../constants/colors";
 
 const Button = ({ onPress, text, iconName, iconNameMaterial, style }) => {
+  const [scale, setScale] = React.useState(1);
+  const [opacity, setOpacity] = React.useState(1);
+
+  const handlePressIn = () => {
+    setScale(1.1);
+    setOpacity(0.8);
+  };
+
   return (
-    <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
+    <TouchableOpacity
+      style={[styles.button, style]}
+      onPress={() => {
+        handlePressIn();
+        onPress();
+      }}
+    >
       <View style={styles.innerContainer}>
         {iconName && (
           <FontAwesome5 name={iconName} size={25} color={colors.white} />
