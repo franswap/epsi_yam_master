@@ -194,13 +194,13 @@ const GameService = {
         return { playerTimer, opponentTimer };
       },
       gamePawns: (playerKey, gameState) => {
-        const { currentTurn, player1Pawns, player2Pawns } = gameState;
+        const { player1Pawns, player2Pawns } = gameState;
 
         // Selon la clé du joueur on adapte la réponse (player / opponent)
         const playerPawns =
-          currentTurn === playerKey ? player2Pawns : player1Pawns;
+          playerKey === "player:1" ? player1Pawns : player2Pawns;
         const opponentPawns =
-          currentTurn === playerKey ? player1Pawns : player2Pawns;
+          playerKey === "player:1" ? player2Pawns : player1Pawns;
         return { playerPawns, opponentPawns };
       },
       gameScore: (playerKey, gameState) => {
@@ -248,17 +248,16 @@ const GameService = {
         };
       },
       // Créer le résumé de la partie
-      gameSummary: (playerKey, gameState) => {
-        const {
-          winner,
-          player1Score,
-          player2Score,
-          player1Socket,
-          player2Socket,
-        } = gameState;
+      gameSummary: (playerKey, game) => {
+        const { player1Socket, player2Socket } = game;
+        const { winner, player1Score, player2Score } = game.gameState;
 
-        const isOpponentDisconnected = !player1Socket || !player2Socket;
-        const isWinner = playerKey === winner;
+        let isOpponentDisconnected = !player1Socket.connected;
+        if (!player2Socket.isBot) {
+          isOpponentDisconnected = !player2Socket.connected;
+        }
+
+        const isWinner = playerKey === winner && !isOpponentDisconnected;
         const isDraw = winner === null && !isOpponentDisconnected;
         const isLoser = !isWinner && !isDraw && !isOpponentDisconnected;
 

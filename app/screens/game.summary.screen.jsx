@@ -8,7 +8,6 @@ const GameSummaryScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     setGameSummary(route.params.data);
-    console.log(gameSummary);
   }, []);
 
   // Pour info gameSummary = {isOpponentDisconnected, isWinner, isLoser, isDraw, playerScore, opponentScore }

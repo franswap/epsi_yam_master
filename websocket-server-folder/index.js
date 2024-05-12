@@ -96,8 +96,8 @@ function updateClientsViewEnd(game) {
   emitToPlayers(
     game,
     "game.end",
-    GameService.send.forPlayer.gameSummary("player:1", game.gameState),
-    GameService.send.forPlayer.gameSummary("player:2", game.gameState)
+    GameService.send.forPlayer.gameSummary("player:1", game),
+    GameService.send.forPlayer.gameSummary("player:2", game)
   );
 }
 
@@ -164,7 +164,6 @@ const createGame = (player1Socket, player2Socket, data) => {
     newGame["player2Socket"] = { id: "bot" + newGame["idGame"], isBot: true };
     newGame.gameState.bot.hasBot = true;
     newGame.gameState.bot.difficulty = data.difficulty;
-    console.log("createBotGame");
   } else {
     newGame["player2Socket"] = player2Socket;
   }
@@ -447,11 +446,11 @@ io.on("connection", (socket) => {
     const game = GameService.utils.findGameBySocketId(games, socket.id);
 
     // DEV: format dices for AI training
-    const dices = game.gameState.deck.dices;
-    const dicesFormatted = formatDicesTrainingAI(dices);
-    if (dicesFormatted) {
-      console.log(dicesFormatted, ",");
-    }
+    // const dices = game.gameState.deck.dices;
+    // const dicesFormatted = formatDicesTrainingAI(dices);
+    // if (dicesFormatted) {
+    //   console.log(dicesFormatted, ",");
+    // }
 
     rollDices(game);
   });
