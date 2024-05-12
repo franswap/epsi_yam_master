@@ -3,26 +3,26 @@
 Cette application est un jeu mobile codé en react-native, ayant pour but de travailler sur l'architecture applicative et les websockets.
 
 Deux modes de jeu sont disponibles sur cette v1 de l'application :
-- un mode multijoueur ou deux joueurs s'affronte,
-- un versus bot, avec actuellement deux niveaux disponibles, le niveau difficile est actuellement en cours de preparation
 
-Le bot utilise un reseau de neuronne, actuellement celui d'une bibliothete: brain.js
+- un mode multijoueur ou deux joueurs s'affronte
+- un versus bot, avec actuellement deux niveaux disponibles, le niveau difficile n'est pas fini
 
-La palette de couleur est inspirée de OIL 6 PALETTE de GrafxKid (https://lospec.com/palette-list/oil-6). Le jeu a été maquetté sur Figma. Les animations des dés et des bouttons ont été réalisées avec react reanimated (https://www.reanimated2.com/).
+Le bot utilise des fonctions conditionnelles ainsi qu'un réseau de neuronne pour le niveau moyen.
+On le model d'IA par réseau de neuronne avec la bibliothèque: Brain.js
+
+La palette de couleur est inspirée de OIL 6 PALETTE de GrafxKid (https://lospec.com/palette-list/oil-6). Le jeu a été maquetté sur Figma.
+Les animations des dés et des boutons ont été réalisées avec react reanimated (https://www.reanimated3.com/).
 
 ## 🚀 How to use
 
-### Running the app
+### Démarrer l'application web/mobile (front)
 
-- Run `yarn` or `npm install`
-- Open `App.js` and change the `socketEndpoint` at the top of the file to point to your endpoint.
-- Open `app` with `yarn start` or `npm run start` to try it out.
+- Lancer `yarn` ou `npm install` pour installer les dépendances.
+- Utilisation sur mobile : ouvrir `App.js` et changer le `socketEndpoint` en haut du fichier pour pointer vers votre ip.
+- Exécuter `yarn start` ou `npm run start` pour démarrer l'application web/mobile.
 
-### Running the server
+### Démarrer le serveur node.js websocket (back)
 
-- `cd` into the `backend` directory and run `yarn` or `npm install`, then run `yarn start` or `npm run start`
-- Install [ngrok](https://ngrok.com/download) and run `ngrok http 3000` and copy the https url that looks something like this `https://f7333e87.ngrok.io`.
-
-## 📝 Notes
-
-React Native provides a socket-io compatible WebSocket implementation, some people get tripped up on the https requirement so this example helps to clarify how you can get it running.
+- `cd` vers le dossier `websocket-server-folder`
+- Exécuter `yarn` or `npm install` pour installer les dépendances.
+- Exécuter `yarn start` or `npm run start` pour démarrer le serveur node.js websocket.
