@@ -15,7 +15,7 @@ const PlayerPawns = () => {
 
   return (
     <View style={styles.playerPawnsContainer}>
-      <Text style={styles.playerPawnsText}>Pawns: {playerPawns}</Text>
+      <Text style={styles.playerPawnsText}>Pions : {playerPawns}</Text>
     </View>
   );
 };

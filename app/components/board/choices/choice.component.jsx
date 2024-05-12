@@ -28,8 +28,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    width: "90px",
-    height: "35px",
+    width: 90,
+    height: 50,
   },
   selectedChoice: {
     backgroundColor: "#c69fa5",
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   choiceText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: "bold",
     color: "#494d7e",
   },

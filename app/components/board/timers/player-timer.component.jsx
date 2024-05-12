@@ -15,7 +15,7 @@ const PlayerTimer = () => {
 
   return (
     <View style={styles.playerTimerContainer}>
-      <Text style={styles.playerTimerText}>Timer: {playerTimer}</Text>
+      <Text style={styles.playerTimerText}>Temps : {playerTimer}</Text>
     </View>
   );
 };

@@ -14,7 +14,6 @@ const PlayerDeck = () => {
 
   useEffect(() => {
     socket.on("game.deck.view-state", (data) => {
-      console.log("game.deck.view-state", data);
       setDisplayPlayerDeck(data["displayPlayerDeck"]);
       if (data["displayPlayerDeck"]) {
         setDisplayRollButton(data["displayRollButton"]);
@@ -46,14 +45,17 @@ const PlayerDeck = () => {
         <>
           <View style={styles.diceContainer}>
             {dices.map((diceData, index) => (
-              <Dice
-                key={diceData.id}
-                index={index}
-                locked={diceData.locked}
-                value={diceData.value}
-                onPress={toggleDiceLock}
-                opponent={false}
-              />
+              <View key={diceData.id}>
+                <Dice
+                  key={diceData.id}
+                  index={index}
+                  locked={diceData.locked}
+                  value={diceData.value}
+                  onPress={toggleDiceLock}
+                  opponent={false}
+                  rollsCounter={rollsCounter}
+                />
+              </View>
             ))}
           </View>
 
