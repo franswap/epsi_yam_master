@@ -1,5 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
+import { useContext } from "react";
+import { SocketContext } from "../../contexts/socket.context";
 import PlayerDeck from "./decks/player-deck.component";
 import OpponentDeck from "./decks/opponent-deck.component";
 import PlayerTimer from "./timers/player-timer.component";
@@ -10,6 +12,7 @@ import PlayerPawns from "./pawns/playerPawns.component";
 import PlayerScore from "./scores/playerScore.component";
 import OpponentScore from "./scores/opponentScore.component";
 import OpponentPawns from "./pawns/opponentPawns.component";
+import Button from "../button";
 
 const OpponentInfos = () => {
   return (
@@ -27,9 +30,36 @@ const PlayerInfos = () => {
   );
 };
 
-const Board = () => {
+const Board = ({ navigation }) => {
+  const socket = useContext(SocketContext);
+
+  const backToHome = () => {
+    navigation.navigate("HomeScreen");
+    // Disconnect from the game
+    socket.emit("game.leave");
+  };
+
   return (
     <View style={styles.container}>
+      <View
+        style={{
+          width: "100%",
+          height: "6%",
+          marginBottom: Platform.OS === "web" ? -10 : 15,
+        }}
+      >
+        <Button
+          onPress={backToHome}
+          iconName="arrow-left"
+          style={{
+            width: 50,
+            height: 50,
+            margin: 10,
+            padding: 8,
+            paddingRight: 0,
+          }}
+        />
+      </View>
       <View style={[styles.rowOpponentCard, { height: "6%" }]}>
         <View>
           <OpponentInfos />
@@ -40,23 +70,18 @@ const Board = () => {
           <OpponentPawns />
         </View>
       </View>
-
-      <View style={[styles.row, { height: "20%" }]}>
+      <View style={[styles.row, { height: "13%" }]}>
         <OpponentDeck />
       </View>
-
       <View style={[styles.row, { height: "35%" }]}>
         <Grid />
       </View>
-
       <View style={[styles.row, { height: "8%" }]}>
         <Choices />
       </View>
-
       <View style={[styles.row, { height: "20%" }]}>
         <PlayerDeck />
       </View>
-
       <View style={[styles.rowOpponentCard, { height: "6%" }]}>
         <View>
           <PlayerInfos />

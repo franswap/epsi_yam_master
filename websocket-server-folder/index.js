@@ -135,18 +135,18 @@ const updateGameInterval = (game) => {
 };
 
 const handlePlayersDisconnects = (game, gameInterval) => {
-  game.player1Socket.on("disconnect", () => {
+  const disconnect = () => {
     clearInterval(gameInterval);
     updateClientsViewEnd(game);
     games = GameService.utils.deleteGame(games, game);
-  });
+  };
+
+  game.player1Socket.on("disconnect", () => disconnect());
+  game.player1Socket.on("game.leave", () => disconnect());
 
   if (!game.player2Socket.isBot) {
-    game.player2Socket.on("disconnect", () => {
-      clearInterval(gameInterval);
-      updateClientsViewEnd(game);
-      games = GameService.utils.deleteGame(games, game);
-    });
+    game.player2Socket.on("disconnect", () => disconnect());
+    game.player2Socket.on("game.leave", () => disconnect());
   }
 };
 

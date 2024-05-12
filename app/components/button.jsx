@@ -27,9 +27,7 @@ const Button = ({ onPress, text, iconName, iconNameMaterial, style }) => {
       withTiming(1.2, { duration: 150 }),
       2, // Nombre de répétitions
       true, // Pour répéter en sens inverse
-      () => {
-        onPress();
-      }
+      onPress()
     );
     opacity.value = withRepeat(withTiming(0.8, { duration: 150 }), 2, true);
   };

@@ -51,13 +51,19 @@ export default function VsBotGameController({ navigation }) {
             text="Normal"
             iconNameMaterial="robot"
           />
-          <Button
+          {/* <Button
             style={styles.mb20}
             onPress={() => {
               handleDifficultyChange(3);
             }}
             text="Difficile"
             iconNameMaterial="robot-angry"
+          /> */}
+          <Button
+            onPress={() => navigation.navigate("HomeScreen")}
+            text="Revenir au menu"
+            iconName="home"
+            style={{ marginTop: 50 }}
           />
         </>
       )}
@@ -76,7 +82,7 @@ export default function VsBotGameController({ navigation }) {
         </>
       )}
 
-      {inGame && <Board />}
+      {inGame && <Board navigation={navigation} />}
     </View>
   );
 }

@@ -78,7 +78,7 @@ export default function OnlineGameController({ navigation }) {
         </>
       )}
 
-      {inGame && <Board />}
+      {inGame && <Board navigation={navigation} />}
     </View>
   );
 }
