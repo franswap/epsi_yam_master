@@ -21,11 +21,11 @@ const Dice = ({ index, locked, value, onPress, opponent, rollsCounter }) => {
   });
   useEffect(() => {
     if (!locked) {
-      rotation.value = withTiming(360, { duration: 800 }, () => {
+      rotation.value = withTiming(360, { duration: 700 }, () => {
         rotation.value = 0;
       });
     }
-  }, [rollsCounter]);
+  }, [rollsCounter, value]);
 
   return (
     <Animated.View style={animatedStyle}>
@@ -56,10 +56,6 @@ const createStyles = StyleSheet.create((diceWidth) => ({
     fontSize: 20,
     fontWeight: "bold",
     color: "#494d7e",
-  },
-  opponentText: {
-    fontSize: 12,
-    color: "red",
   },
 }));
 

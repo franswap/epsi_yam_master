@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   noChoicesText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: "bold",
     color: colors.white,
   },

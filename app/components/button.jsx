@@ -31,7 +31,7 @@ const Button = ({ onPress, text, iconName, iconNameMaterial, style }) => {
         onPress();
       }
     );
-    opacity.value = withRepeat(withTiming(0.8, { duration: 100 }), 2, true);
+    opacity.value = withRepeat(withTiming(0.8, { duration: 150 }), 2, true);
   };
 
   return (

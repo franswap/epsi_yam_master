@@ -14,7 +14,7 @@ const OpponentTimer = () => {
   }, []);
   return (
     <View style={styles.opponentTimerContainer}>
-      <Text style={styles.opponentTimerText}>Timer: {opponentTimer}</Text>
+      <Text style={styles.opponentTimerText}>Temps : {opponentTimer}</Text>
     </View>
   );
 };

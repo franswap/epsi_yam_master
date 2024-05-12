@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   choiceText: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: "bold",
     color: "#494d7e",
   },
