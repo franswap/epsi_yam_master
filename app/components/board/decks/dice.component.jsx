@@ -9,7 +9,7 @@ import Animated, {
 const Dice = ({ index, locked, value, onPress, opponent, rollsCounter }) => {
   const handlePress = () => onPress(index, opponent);
   const windowWidth = window.innerWidth;
-  const diceWidth = windowWidth <= "600" ? windowWidth / 5 - 1 : 65;
+  const diceWidth = windowWidth <= 600 ? windowWidth / 5 - 1 : 65;
   const styles = createStyles(diceWidth);
 
   // Animation

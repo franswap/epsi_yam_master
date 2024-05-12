@@ -28,8 +28,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    width: "90px",
-    height: "35px",
+    width: 90,
+    height: 50,
   },
   selectedChoice: {
     backgroundColor: "#c69fa5",
