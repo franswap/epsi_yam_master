@@ -3,6 +3,8 @@ import http from "http";
 import { Server } from "socket.io";
 import uniqid from "uniqid";
 import GameService from "./services/game.service.js";
+import { formatDicesTrainingAI, formatDicesRunAI } from "./ia/utils.js";
+import { runModel } from "./ia/model.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -14,6 +16,7 @@ const io = new Server(server);
 
 let queue = [];
 let games = [];
+const modelLockDices = "./ia/models/model_lock_dices.json";
 
 // ---------------------------------
 // -------- EMIT METHODS -----------
@@ -307,32 +310,71 @@ const selectCell = (game, cellId, rowIndex, cellIndex) => {
   // Si la partie est terminée, on met à jour la vue de fin
   if (game.gameState.winner || hasNoMorePawns) {
     updateClientsViewEnd(game);
-  }
-
-  // Sinon on finit le tour
-  else
+  } // Sinon on finit le tour
+  else {
     game.gameState.currentTurn =
       game.gameState.currentTurn === "player:1" ? "player:2" : "player:1";
 
-  // On remet le timer, le deck et les choix par défaut (la grille ne change pas)
-  game.gameState.timer = GameService.timer.getTurnDuration();
-  game.gameState.deck = GameService.init.deck();
-  game.gameState.choices = GameService.init.choices();
+    // On remet le timer, le deck et les choix par défaut (la grille ne change pas)
+    game.gameState.timer = GameService.timer.getTurnDuration();
+    game.gameState.deck = GameService.init.deck();
+    game.gameState.choices = GameService.init.choices();
 
-  // et on remet à jour les vues
-  updateClientsViewPawns(game);
-  updateClientsViewScore(game);
+    // et on remet à jour les vues
+    updateClientsViewPawns(game);
+    updateClientsViewScore(game);
+    updateClientsViewDecks(game);
+    updateClientsViewChoices(game);
+    updateClientsViewGrid(game);
+    updateClientsViewTimers(game);
+  }
+};
+
+// Unlock or lock dice
+const toggleDice = (game, idDice) => {
+  const diceIndex = GameService.utils.findDiceIndexByDiceId(
+    game.gameState.deck.dices,
+    idDice
+  );
+  game.gameState.deck.dices[diceIndex].locked =
+    !game.gameState.deck.dices[diceIndex].locked;
   updateClientsViewDecks(game);
-  updateClientsViewChoices(game);
-  updateClientsViewGrid(game);
-  updateClientsViewTimers(game);
+};
+
+const lockDice = (game, idDice) => {
+  const diceIndex = GameService.utils.findDiceIndexByDiceId(
+    game.gameState.deck.dices,
+    idDice
+  );
+  game.gameState.deck.dices[diceIndex].locked = true;
+  updateClientsViewDecks(game);
+};
+
+const botLockDices = async (game) => {
+  const { dices } = game.gameState.deck;
+
+  if (game.gameState.deck.rollsCounter <= game.gameState.deck.rollsMaximum) {
+    // Unlocked all dices
+    game.gameState.deck.dices = GameService.dices.unlockEveryDice(dices);
+
+    // Run AI model to calculate which dices to lock
+    const dicesFormatted = formatDicesRunAI(dices);
+    const output = runModel(modelLockDices, dicesFormatted);
+    // Lock dices
+    for (let i = 0; i < output.length; i++) {
+      if (output[i] >= 0.8) {
+        await delay(400);
+        lockDice(game, dices[i].id);
+      }
+    }
+  }
 };
 
 const botEasyMakeDecision = async (game) => {
   // Loop through all choices available
   for (let i = 0; i < game.gameState.choices.availableChoices.length; i++) {
     const choice = game.gameState.choices.availableChoices[i];
-    await delay(2000);
+    await delay(1500);
     selectChoice(game, choice.id);
 
     // Find cell that can be checked
@@ -341,11 +383,16 @@ const botEasyMakeDecision = async (game) => {
     );
     if (resultFindCell) {
       const { cell, rowIndex, cellIndex } = resultFindCell;
-      await delay(2000);
+      await delay(1500);
       selectCell(game, cell.id, rowIndex, cellIndex);
       break; // Exit loop
     }
   }
+};
+
+const botNormalMakeDecision = async (game) => {
+  botLockDices(game);
+  await botEasyMakeDecision(game);
 };
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -358,14 +405,14 @@ const botPlay = async (game) => {
         game.gameState.bot.hasBot &&
         game.gameState.currentTurn === "player:2"
       ) {
-        await delay(2000);
+        await delay(1500);
         rollDices(game);
 
         // make decision based on difficulty
         if (game.gameState.bot.difficulty === 1) {
           await botEasyMakeDecision(game);
         } else if (game.gameState.bot.difficulty === 2) {
-          await botEasyMakeDecision(game);
+          await botNormalMakeDecision(game);
         } else if (game.gameState.bot.difficulty === 3) {
           await botEasyMakeDecision(game);
         }
@@ -398,21 +445,20 @@ io.on("connection", (socket) => {
 
   socket.on("game.dices.roll", () => {
     const game = GameService.utils.findGameBySocketId(games, socket.id);
+
+    // DEV: format dices for AI training
+    const dices = game.gameState.deck.dices;
+    const dicesFormatted = formatDicesTrainingAI(dices);
+    if (dicesFormatted) {
+      console.log(dicesFormatted, ",");
+    }
+
     rollDices(game);
   });
 
   socket.on("game.dices.lock", (idDice) => {
     const game = GameService.utils.findGameBySocketId(games, socket.id);
-
-    const diceIndex = GameService.utils.findDiceIndexByDiceId(
-      game.gameState.deck.dices,
-      idDice
-    );
-
-    game.gameState.deck.dices[diceIndex].locked =
-      !game.gameState.deck.dices[diceIndex].locked;
-
-    updateClientsViewDecks(game);
+    toggleDice(game, idDice);
   });
 
   socket.on("game.choices.selected", (idChoice) => {

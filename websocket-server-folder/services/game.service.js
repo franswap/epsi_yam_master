@@ -152,6 +152,13 @@ const GameService = {
       }));
       return lockedDices;
     },
+    unlockEveryDice: (dicesToUnlock) => {
+      const unlockedDices = dicesToUnlock.map((dice) => ({
+        ...dice,
+        locked: false,
+      }));
+      return unlockedDices;
+    },
   },
 
   send: {
