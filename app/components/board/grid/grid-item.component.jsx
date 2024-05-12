@@ -30,9 +30,7 @@ const GridItem = ({ cell, isSelectable, onPress }) => {
         withTiming(1.1, { duration: 150 }),
         2,
         true,
-        () => {
-          onPress();
-        }
+        onPress()
       );
       opacity.value = withRepeat(withTiming(0.8, { duration: 150 }), 2, true);
     } else {

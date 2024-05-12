@@ -11,18 +11,6 @@ export default function OnlineGameController({ navigation }) {
   const [inQueue, setInQueue] = useState(false);
   const [inGame, setInGame] = useState(false);
 
-  // Écouter l'événement 'game.end'
-  useEffect(() => {
-    socket.on("game.end", (data) => {
-      navigation.navigate("GameSummaryScreen", { data });
-    });
-
-    // Supprimer l'écouteur d'événement lorsque le composant est démonté
-    return () => {
-      socket.off("game.end");
-    };
-  }, [navigation, socket]);
-
   // fonction pour quitter la queue
   const leaveQueue = () => {
     console.log("[emit][queue.leave]:", socket.id);
@@ -31,27 +19,36 @@ export default function OnlineGameController({ navigation }) {
   };
 
   useEffect(() => {
+    // Rejoindre la queue
     console.log("[emit][queue.join]:", socket.id);
     socket.emit("queue.join");
     setInQueue(false);
     setInGame(false);
 
+    // Quand le joueur est dans la queue
     socket.on("queue.added", (data) => {
       console.log("[listen][queue.added]:", data);
       setInQueue(data["inQueue"]);
       setInGame(data["inGame"]);
     });
 
+    // Quand le joueur est en jeu
     socket.on("game.start", (data) => {
       console.log("[listen][game.start]:", data);
       setInQueue(data["inQueue"]);
       setInGame(data["inGame"]);
     });
 
+    // Quand le joueur quitte la queue
     socket.on("queue.removed", (data) => {
       console.log("[listen][queue.leave]:", data);
       setInQueue(data["inQueue"]);
       setInGame(data["inGame"]);
+    });
+
+    // Quand jeu est terminé
+    socket.on("game.end", (data) => {
+      navigation.navigate("GameSummaryScreen", { data });
     });
   }, []);
 
@@ -81,7 +78,7 @@ export default function OnlineGameController({ navigation }) {
         </>
       )}
 
-      {inGame && <Board />}
+      {inGame && <Board navigation={navigation} />}
     </View>
   );
 }

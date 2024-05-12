@@ -10,22 +10,15 @@ export default function VsBotGameController({ navigation }) {
   const [inGame, setInGame] = useState(false);
   const [difficulty, setDifficulty] = useState(null);
 
-  // Écouter l'événement 'game.end'
-  useEffect(() => {
-    socket.on("game.end", (data) => {
-      navigation.navigate("GameSummaryScreen", { data });
-    });
-
-    // Supprimer l'écouteur d'événement lorsque le composant est démonté
-    return () => {
-      socket.off("game.end");
-    };
-  }, [navigation, socket]);
-
   useEffect(() => {
     socket.on("game.start", (data) => {
       console.log("[listen][game.start]:", data);
       setInGame(data["inGame"]);
+    });
+
+    // Quand jeu est terminé
+    socket.on("game.end", (data) => {
+      navigation.navigate("GameSummaryScreen", { data });
     });
   }, []);
 
@@ -58,13 +51,19 @@ export default function VsBotGameController({ navigation }) {
             text="Normal"
             iconNameMaterial="robot"
           />
-          <Button
+          {/* <Button
             style={styles.mb20}
             onPress={() => {
               handleDifficultyChange(3);
             }}
             text="Difficile"
             iconNameMaterial="robot-angry"
+          /> */}
+          <Button
+            onPress={() => navigation.navigate("HomeScreen")}
+            text="Revenir au menu"
+            iconName="home"
+            style={{ marginTop: 50 }}
           />
         </>
       )}
@@ -83,7 +82,7 @@ export default function VsBotGameController({ navigation }) {
         </>
       )}
 
-      {inGame && <Board />}
+      {inGame && <Board navigation={navigation} />}
     </View>
   );
 }

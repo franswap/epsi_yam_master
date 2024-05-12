@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: 90,
-    height: 50,
+    height: 40,
   },
   selectedChoice: {
     backgroundColor: "#c69fa5",
