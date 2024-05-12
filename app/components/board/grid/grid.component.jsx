@@ -37,7 +37,9 @@ const Grid = () => {
                   key={cell.id}
                   cell={cell}
                   isSelectable={isSelectable}
-                  onPress={() => handleSelectCell(cell.id, rowIndex, cellIndex)}
+                  onPress={() => {
+                    handleSelectCell(cell.id, rowIndex, cellIndex);
+                  }}
                 />
               );
             })}
