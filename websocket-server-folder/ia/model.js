@@ -7,6 +7,8 @@ const trainModel = (dataPath, modelPath) => {
   const net = new brain.NeuralNetwork({
     hiddenLayers: [10, 7, 5],
     outputSize: 5,
+    learningRate: 0.01,
+    iterations: 40000,
   });
   net.train(trainingData);
 

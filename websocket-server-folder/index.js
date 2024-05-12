@@ -361,7 +361,7 @@ const botLockDices = async (game) => {
     const output = runModel(modelLockDices, dicesFormatted);
     // Lock dices
     for (let i = 0; i < output.length; i++) {
-      if (output[i] >= 0.7) {
+      if (output[i] >= 0.85) {
         await delay(400);
         lockDice(game, dices[i].id);
       }
