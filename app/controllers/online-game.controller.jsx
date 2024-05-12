@@ -10,7 +10,6 @@ export default function OnlineGameController({ navigation }) {
 
   const [inQueue, setInQueue] = useState(false);
   const [inGame, setInGame] = useState(false);
-  const [idOpponent, setIdOpponent] = useState(null);
 
   // Écouter l'événement 'game.end'
   useEffect(() => {
@@ -47,7 +46,6 @@ export default function OnlineGameController({ navigation }) {
       console.log("[listen][game.start]:", data);
       setInQueue(data["inQueue"]);
       setInGame(data["inGame"]);
-      setIdOpponent(data["idOpponent"]);
     });
 
     socket.on("queue.removed", (data) => {
