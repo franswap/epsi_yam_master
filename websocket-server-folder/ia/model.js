@@ -1,5 +1,5 @@
-import brain from "brain.js";
-import fs from "fs";
+const brain = require("./libs/brain.js");
+const fs = require("fs");
 
 // Entraîner un modèle
 const trainModel = (dataPath, modelPath) => {
@@ -34,4 +34,4 @@ const loadJSON = (filePath) => {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 };
 
-export { trainModel, runModel };
+module.exports = { trainModel, runModel };

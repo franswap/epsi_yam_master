@@ -33,4 +33,4 @@ const formatDicesRunAI = (dices) => {
   return inputValues;
 };
 
-export { formatDicesTrainingAI, formatDicesRunAI };
+module.exports = { formatDicesTrainingAI, formatDicesRunAI };

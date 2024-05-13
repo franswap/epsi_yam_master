@@ -1,10 +1,10 @@
-import express from "express";
-import http from "http";
-import { Server } from "socket.io";
-import uniqid from "uniqid";
-import GameService from "./services/game.service.js";
-import { formatDicesTrainingAI, formatDicesRunAI } from "./ia/utils.js";
-import { runModel } from "./ia/model.js";
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const uniqid = require("uniqid");
+const GameService = require("./services/game.service.js");
+const { formatDicesTrainingAI, formatDicesRunAI } = require("./ia/utils.js");
+const { runModel } = require("./ia/model.js");
 
 const app = express();
 const server = http.createServer(app);
