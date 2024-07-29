@@ -573,4 +573,4 @@ const GameService = {
   },
 };
 
-export default GameService;
+module.exports = GameService;
